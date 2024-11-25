@@ -72,3 +72,32 @@ eval_local <- function(path = ".", reporter = NULL, ..., load_package = "source"
     load_package = load_package
   )
 }
+
+# active file ---------
+evaluate_active_file <- function(file = find_active_file(), ...) {
+  pkg <- devtools::as.package(dirname(file))
+  withr::local_envvar(devtools::r_env_vars())
+  if (is_rstudio_running()) {
+    rstudioapi::executeCommand("activateConsole", quiet = TRUE)
+  }
+  load_package <- load_package_for_testing(pkg)
+  testthat::test_file(
+    file,
+    package = pkg$package,
+    load_package = load_package,
+    reporter = EvalCompactProgressReporter$new(),
+    ...
+  )
+}
+
+find_active_file <- function(arg = "file", call = parent.frame()) {
+  if (!is_rstudio_running()) {
+    cli::cli_abort("Argument {.arg {arg}} is missing, with no default",
+                   call = call)
+  }
+  normalizePath(rstudioapi::getSourceEditorContext()$path)
+}
+
+is_rstudio_running <- function() {
+  !is_testing() && rstudioapi::isAvailable()
+}
