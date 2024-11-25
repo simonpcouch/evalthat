@@ -16,6 +16,8 @@ Imports:
     R6,
     rlang,
     testthat,
+    treesitter,
+    treesitter.r,
     withr
 Suggests:
     knitr

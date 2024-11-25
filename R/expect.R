@@ -1,15 +1,28 @@
-expect_syntactically_valid <- function(object) {
-  # TODO: treesitter.r-fu
-  expect(TRUE, "Output was not syntactically valid.")
+expect_r_code <- function(object) {
+  # object <- "cli::cli_abort(\"hey there\")"
+
+  tree <- treesitter::parser_parse(r_parser, object)
+  node <- treesitter::tree_root_node(tree)
+
+  expect(
+    !treesitter::node_has_error(node),
+    "Output was not syntactically valid R code."
+  )
 }
 
+# TODO: should this be able to detect having been called programmatically?
+# e.g. lapply(list(a = 1:2, b = 3:4), mean)
 expect_calls <- function(object, fn) {
-  # TODO: treesitter.r-fu
-  invisible(object)
-}
+  query <- treesitter::query(r_language, "(call function: (_) @func_name)")
+  tree <- treesitter::parser_parse(r_parser, object)
+  node <- treesitter::tree_root_node(tree)
+  captures <- treesitter::query_captures(query, node)
 
-expect_n_calls <- function(object, n) {
-  # TODO: treesitter.r-fu
+  expect(
+    fn %in% sapply(captures$node, treesitter::node_text),
+    "Function {.fn} was not called."
+  )
+
   invisible(object)
 }
 
