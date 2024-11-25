@@ -14,7 +14,7 @@ Imports:
     cli,
     pkgload,
     R6,
-    rlang,
+    rlang (>= 1.1.0),
     testthat,
     treesitter,
     treesitter.r,

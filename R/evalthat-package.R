@@ -2,6 +2,6 @@
 "_PACKAGE"
 
 ## usethis namespace: start
-#' @import testthat
+#' @import rlang
 ## usethis namespace: end
 NULL
