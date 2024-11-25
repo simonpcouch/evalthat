@@ -66,5 +66,34 @@ test_that("cli pal collapses ad-hoc enumeration", {
 
   # line breaks in reasonable places
   expect_match(output, "cli_abort(\n", fixed = TRUE)
-  expect_match(output, "\n)", fixed = TRUE)
+  expect_match(output, "\n)$")
+})
+
+test_that("cli pal collapses ad-hoc enumeration (pt. 2)", {
+  cli_pal <- pal::.init_pal("cli")
+  input <- "
+    rlang::abort(paste0(
+      \"The workflow has arguments to be tuned that are missing some \",
+      \"parameter objects: \",
+      paste0(\"'\", pset$id[!params], \"'\", collapse = \", \")
+    ))
+  "
+  output <- cli_pal$chat(input)
+
+  expect_r_code(output)
+  expect_match(output, "cli::cli_abort", fixed = TRUE)
+
+  # inlines ad-hoc enumeration in message
+  expect_match(output, "^cli")
+
+  # incorporates inline markup
+  expect_match(output, "{.arg {pset$id[!params]}}", fixed = TRUE)
+
+  # correctly pluralizes
+  expect_match(output, "object{?s}", fixed = TRUE)
+  expect_match(output, "{?is/are}", fixed = TRUE)
+
+  # line breaks in reasonable places
+  expect_match(output, "cli_abort(\n", fixed = TRUE)
+  expect_match(output, "\n)$")
 })
