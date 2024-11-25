@@ -5,7 +5,7 @@
 #' @export
 EvalCheckReporter <- R6::R6Class(
   "EvalCheckReporter",
-  inherit = Reporter,
+  inherit = testthat::Reporter,
   public = list(
   problems = NULL,
   skips = NULL,
@@ -75,13 +75,18 @@ summary_line <- function(n_fail, n_warn, n_skip, n_pass) {
     if (cond) colorize(text, color) else text
   }
 
+  prop <- n_pass / max(n_fail + n_pass, 1)
+  if (prop == 0) {
+    suffix <- ""
+  } else {
+    suffix <- paste0(": ", color_gradient(prop), "%")
+  }
+
   paste0(
     "",
     colorize_if("PASS", "success", n_pass > 0), " ", n_pass, " | ",
     colorize_if("FAIL", "failure", n_fail > 0), " ", n_fail,
-    ": ",
-    color_gradient(n_pass / max(n_fail + n_pass, 1)),
-    "%"
+    suffix
   )
 }
 

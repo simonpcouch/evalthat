@@ -17,7 +17,7 @@
 #' @family reporters
 EvalProgressReporter <- R6::R6Class(
   "EvalProgressReporter",
-  inherit = Reporter,
+  inherit = testthat::Reporter,
   public = list(
     show_praise = TRUE,
     min_time = 1,
@@ -74,7 +74,7 @@ EvalProgressReporter <- R6::R6Class(
       self$ctxt_issues <- testthat:::Stack$new()
       self$ctxt_start_time <- proc.time()
 
-      context_start_file(self$file_name)
+      #context_start_file(self$file_name)
     },
     start_context = function(context) {
       self$ctxt_name <- context
@@ -242,8 +242,6 @@ EvalProgressReporter <- R6::R6Class(
         self$cat_line()
       }
 
-      skip_report(self)
-
       if (self$problems$size() > 0) {
         problems <- self$problems$as_list()
         self$rule("Failed evals", line = 1)
@@ -254,6 +252,7 @@ EvalProgressReporter <- R6::R6Class(
       }
 
       status <- summary_line(self$n_fail, self$n_warn, self$n_skip, self$n_ok)
+      self$cat_line("")
       self$cat_line(status)
 
       if (self$is_full()) {
@@ -311,7 +310,7 @@ testthat_max_fails <- function() {
 #' @rdname ProgressReporter
 EvalCompactProgressReporter <- R6::R6Class(
   "EvalCompactProgressReporter",
-  inherit = ProgressReporter,
+  inherit = testthat::ProgressReporter,
   public = list(
     initialize = function(min_time = Inf, ...) {
       super$initialize(min_time = min_time, ...)
@@ -321,9 +320,14 @@ EvalCompactProgressReporter <- R6::R6Class(
         self$cat_line()
         self$rule(cli::style_bold(paste0("Testing ", name)), line = 2)
       }
-      super$start_file(name)
+      self$file_name <- name
+      self$ctxt_issues <- testthat:::Stack$new()
+      self$ctxt_start_time <- proc.time()
     },
     start_reporter = function(context) {
+    },
+    start_context = function(context) {
+      self$cat_line(context)
     },
     end_context = function(context) {
       if (self$ctxt_issues$size() == 0) {
@@ -349,10 +353,10 @@ EvalCompactProgressReporter <- R6::R6Class(
           self$cat_line()
         }
         self$cat_line()
-        skip_report(self)
       }
 
       if (had_feedback) {
+        self$cat_line()
         self$show_status()
         self$cat_line()
       } else if (self$is_full()) {
@@ -376,7 +380,7 @@ EvalCompactProgressReporter <- R6::R6Class(
 
 EvalParallelProgressReporter <- R6::R6Class(
   "EvalParallelProgressReporter",
-  inherit = ProgressReporter,
+  inherit = testthat::ProgressReporter,
   public = list(
     files = list(),
     spin_frame = 0L,
@@ -511,32 +515,4 @@ strpad <- function(x, width = cli::console_width()) {
 first_upper <- function(x) {
   substr(x, 1, 1) <- toupper(substr(x, 1, 1))
   x
-}
-
-skip_report <- function(reporter, line = 1) {
-  n <- reporter$skips$size()
-  if (n == 0) {
-    return()
-  }
-
-  reporter$rule(paste0("Skipped tests (", n, ")"), line = line)
-  reporter$cat_line(skip_bullets(reporter$skips$as_list()))
-  reporter$cat_line()
-}
-
-
-skip_bullets <- function(skips) {
-  message <- map_chr(skips, "[[", "message")
-  message <- gsub("Reason: ", "", message)
-  message <- gsub(":?\n(\n|.)+", "", message) # only show first line
-
-  locs <- purrr::map_chr(skips, expectation_location)
-  locs_by_skip <- split(locs, message)
-  n <- lengths(locs_by_skip)
-  skip_summary <- map_chr(locs_by_skip, paste, collapse = ", ")
-
-  bullets <- paste0(
-    cli::symbol$bullet, " ", names(locs_by_skip), " (", n, "): ", skip_summary
-  )
-  cli::ansi_strwrap(bullets, exdent = 2)
 }
