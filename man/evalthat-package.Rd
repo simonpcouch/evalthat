@@ -8,6 +8,14 @@
 \description{
 Testthat-Style LLM Evaluation
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/simonpcouch/evalthat}
+  \item Report bugs at \url{https://github.com/simonpcouch/evalthat/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Simon Couch \email{simon.couch@posit.co} (\href{https://orcid.org/0000-0001-5676-5107}{ORCID})
 
