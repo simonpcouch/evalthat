@@ -1,3 +1,5 @@
+skip()
+
 test_that("example works for some input", {
   # input <- some_input_flag_fn("some text")
   # res <- some_output_flag_fn(clipal$chat(input))
