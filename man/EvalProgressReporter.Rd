@@ -17,26 +17,20 @@ designed for use with single files. It's the default reporter for
 \code{\link[=test_file]{test_file()}}.
 }
 \concept{reporters}
-\section{Super class}{
-\code{\link[testthat:Reporter]{testthat::Reporter}} -> \code{EvalProgressReporter}
+\section{Super classes}{
+\code{\link[testthat:Reporter]{testthat::Reporter}} -> \code{\link[testthat:ProgressReporter]{testthat::ProgressReporter}} -> \code{EvalProgressReporter}
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-EvalProgressReporter-new}{\code{EvalProgressReporter$new()}}
-\item \href{#method-EvalProgressReporter-is_full}{\code{EvalProgressReporter$is_full()}}
-\item \href{#method-EvalProgressReporter-start_reporter}{\code{EvalProgressReporter$start_reporter()}}
 \item \href{#method-EvalProgressReporter-start_file}{\code{EvalProgressReporter$start_file()}}
 \item \href{#method-EvalProgressReporter-start_context}{\code{EvalProgressReporter$start_context()}}
 \item \href{#method-EvalProgressReporter-show_header}{\code{EvalProgressReporter$show_header()}}
-\item \href{#method-EvalProgressReporter-status_data}{\code{EvalProgressReporter$status_data()}}
 \item \href{#method-EvalProgressReporter-show_status}{\code{EvalProgressReporter$show_status()}}
-\item \href{#method-EvalProgressReporter-cr}{\code{EvalProgressReporter$cr()}}
 \item \href{#method-EvalProgressReporter-end_context}{\code{EvalProgressReporter$end_context()}}
 \item \href{#method-EvalProgressReporter-add_result}{\code{EvalProgressReporter$add_result()}}
 \item \href{#method-EvalProgressReporter-end_reporter}{\code{EvalProgressReporter$end_reporter()}}
 \item \href{#method-EvalProgressReporter-report_issues}{\code{EvalProgressReporter$report_issues()}}
-\item \href{#method-EvalProgressReporter-should_update}{\code{EvalProgressReporter$should_update()}}
 \item \href{#method-EvalProgressReporter-clone}{\code{EvalProgressReporter$clone()}}
 }
 }
@@ -53,42 +47,15 @@ designed for use with single files. It's the default reporter for
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="rule"><a href='../../testthat/html/Reporter.html#method-Reporter-rule'><code>testthat::Reporter$rule()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="start_test"><a href='../../testthat/html/Reporter.html#method-Reporter-start_test'><code>testthat::Reporter$start_test()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="update"><a href='../../testthat/html/Reporter.html#method-Reporter-update'><code>testthat::Reporter$update()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="testthat" data-topic="ProgressReporter" data-id="cr"><a href='../../testthat/html/ProgressReporter.html#method-ProgressReporter-cr'><code>testthat::ProgressReporter$cr()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="testthat" data-topic="ProgressReporter" data-id="initialize"><a href='../../testthat/html/ProgressReporter.html#method-ProgressReporter-initialize'><code>testthat::ProgressReporter$initialize()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="testthat" data-topic="ProgressReporter" data-id="is_full"><a href='../../testthat/html/ProgressReporter.html#method-ProgressReporter-is_full'><code>testthat::ProgressReporter$is_full()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="testthat" data-topic="ProgressReporter" data-id="should_update"><a href='../../testthat/html/ProgressReporter.html#method-ProgressReporter-should_update'><code>testthat::ProgressReporter$should_update()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="testthat" data-topic="ProgressReporter" data-id="start_reporter"><a href='../../testthat/html/ProgressReporter.html#method-ProgressReporter-start_reporter'><code>testthat::ProgressReporter$start_reporter()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="testthat" data-topic="ProgressReporter" data-id="status_data"><a href='../../testthat/html/ProgressReporter.html#method-ProgressReporter-status_data'><code>testthat::ProgressReporter$status_data()</code></a></span></li>
 </ul>
 </details>
 }}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-EvalProgressReporter-new"></a>}}
-\if{latex}{\out{\hypertarget{method-EvalProgressReporter-new}{}}}
-\subsection{Method \code{new()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$new(
-  show_praise = TRUE,
-  max_failures = testthat_max_fails(),
-  min_time = 1,
-  update_interval = 0.1,
-  ...
-)}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-EvalProgressReporter-is_full"></a>}}
-\if{latex}{\out{\hypertarget{method-EvalProgressReporter-is_full}{}}}
-\subsection{Method \code{is_full()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$is_full()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-EvalProgressReporter-start_reporter"></a>}}
-\if{latex}{\out{\hypertarget{method-EvalProgressReporter-start_reporter}{}}}
-\subsection{Method \code{start_reporter()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$start_reporter(context)}\if{html}{\out{</div>}}
-}
-
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-EvalProgressReporter-start_file"></a>}}
 \if{latex}{\out{\hypertarget{method-EvalProgressReporter-start_file}{}}}
@@ -117,29 +84,11 @@ designed for use with single files. It's the default reporter for
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-EvalProgressReporter-status_data"></a>}}
-\if{latex}{\out{\hypertarget{method-EvalProgressReporter-status_data}{}}}
-\subsection{Method \code{status_data()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$status_data()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-EvalProgressReporter-show_status"></a>}}
 \if{latex}{\out{\hypertarget{method-EvalProgressReporter-show_status}{}}}
 \subsection{Method \code{show_status()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$show_status(complete = FALSE, time = 0, pad = FALSE)}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-EvalProgressReporter-cr"></a>}}
-\if{latex}{\out{\hypertarget{method-EvalProgressReporter-cr}{}}}
-\subsection{Method \code{cr()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$cr()}\if{html}{\out{</div>}}
 }
 
 }
@@ -176,15 +125,6 @@ designed for use with single files. It's the default reporter for
 \subsection{Method \code{report_issues()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$report_issues(issues)}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-EvalProgressReporter-should_update"></a>}}
-\if{latex}{\out{\hypertarget{method-EvalProgressReporter-should_update}{}}}
-\subsection{Method \code{should_update()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$should_update()}\if{html}{\out{</div>}}
 }
 
 }
