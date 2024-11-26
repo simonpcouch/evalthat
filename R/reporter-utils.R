@@ -7,14 +7,17 @@ summary_line <- function(n_fail, n_warn, n_skip, n_pass) {
   if (prop == 0) {
     suffix <- ""
   } else {
-    suffix <- paste0(": ", color_gradient(prop), "%")
+    suffix <- paste0(": ", color_gradient(prop))
   }
 
   paste0(
     "",
     colorize_if("PASS", "success", n_pass > 0), " ", n_pass, " | ",
     colorize_if("FAIL", "failure", n_fail > 0), " ", n_fail,
-    suffix
+    suffix,
+    # append whitespace to "remove" duplicated percentage signs
+    # when percentage formatting reduces nchar
+    "         "
   )
 }
 
@@ -34,7 +37,7 @@ color_gradient <- function(prop) {
   # make colors slightly darker by setting `maxColorValue` to twice max r and g
   hex_color <- rgb(red, green, b = 0, maxColorValue = 2)
 
-  cli::make_ansi_style(hex_color)(round(prop, 3) * 100)
+  cli::make_ansi_style(hex_color)(sprintf("%.1f%%", prop * 100))
 }
 
 # copied from testthat ---------------------------------------------------------
