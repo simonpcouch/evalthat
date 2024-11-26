@@ -27,21 +27,30 @@ EvalProgressReporter <- R6::R6Class(
     skips = NULL,
     problems = NULL,
     max_fail = NULL,
-    n_ok = 0,
-    n_skip = 0,
-    n_warn = 0,
-    n_fail = 0,
+    res_ok = numeric(),
+    res_skip = numeric(),
+    res_warn = numeric(),
+    res_fail = numeric(),
     frames = NULL,
     dynamic = FALSE,
     ctxt_start_time = NULL,
     ctxt_issues = NULL,
     ctxt_n = 0,
+    ctxt_res_ok = numeric(),
+    ctxt_res_skip = numeric(),
+    ctxt_res_warn = numeric(),
+    ctxt_res_fail = numeric(),
+    ctxt_name = "",
+    file_name = "",
+    n_ok = 0,
+    n_skip = 0,
+    n_warn = 0,
+    n_fail = 0,
     ctxt_n_ok = 0,
     ctxt_n_skip = 0,
     ctxt_n_warn = 0,
     ctxt_n_fail = 0,
-    ctxt_name = "",
-    file_name = "",
+
     start_file = function(file) {
       self$file_name <- file
       self$ctxt_issues <- testthat:::Stack$new()
@@ -49,19 +58,32 @@ EvalProgressReporter <- R6::R6Class(
 
       #context_start_file(self$file_name)
     },
+
+    update_counts = function() {
+      self$n_ok <- sum(self$res_ok)
+      self$n_skip <- sum(self$res_skip)
+      self$n_warn <- sum(self$res_warn)
+      self$n_fail <- sum(self$res_fail)
+      self$ctxt_n_ok <- sum(self$ctxt_res_ok)
+      self$ctxt_n_skip <- sum(self$ctxt_res_skip)
+      self$ctxt_n_warn <- sum(self$ctxt_res_warn)
+      self$ctxt_n_fail <- sum(self$ctxt_res_fail)
+    },
+
     start_context = function(context) {
       self$ctxt_name <- context
       self$ctxt_issues <- testthat:::Stack$new()
 
-      self$ctxt_n <- 0L
-      self$ctxt_n_ok <- 0L
-      self$ctxt_n_fail <- 0L
-      self$ctxt_n_warn <- 0L
-      self$ctxt_n_skip <- 0L
+      self$ctxt_res_ok <- numeric()
+      self$ctxt_res_fail <- numeric()
+      self$ctxt_res_warn <- numeric()
+      self$ctxt_res_skip <- numeric()
 
+      self$ctxt_n <- 0L
       self$ctxt_start_time <- proc.time()
       self$show_status()
     },
+
     show_header = function() {
       self$cat_line(
         colorize(cli::symbol$tick, "success"), " | ",
@@ -70,23 +92,23 @@ EvalProgressReporter <- R6::R6Class(
         " | ", "Context"
       )
     },
+
     show_status = function(complete = FALSE, time = 0, pad = FALSE) {
       data <- self$status_data()
       if (complete) {
-        if (data$n_fail > 0) {
+        if (self$n_fail > 0) {
           status <- cli::col_red(cli::symbol$cross)
         } else {
           status <- cli::col_green(cli::symbol$tick)
         }
       } else {
-        # Do not print if not enough time has passed since we last printed.
         if (!self$should_update()) {
           return()
         }
         status <- spinner(self$frames, data$n)
-        if (data$n_fail > 0) {
+        if (self$n_fail > 0) {
           status <- colorize(status, "failure")
-        } else if (data$n_warn > 0) {
+        } else if (self$n_warn > 0) {
           status <- colorize(status, "warning")
         }
       }
@@ -104,14 +126,13 @@ EvalProgressReporter <- R6::R6Class(
           } else {
             colorize(n, type)
           }
-
         }
       }
 
       message <- paste0(
         status, " | ",
-        sprintf("%4d", data$n_ok), " ",
-        sprintf("%4d", data$n_fail),
+        sprintf("%4d", self$n_ok), " ",
+        sprintf("%4d", self$n_fail),
         " | ", data$name
       )
 
@@ -134,6 +155,7 @@ EvalProgressReporter <- R6::R6Class(
         self$cat_line(self$cr(), message)
       }
     },
+
     end_context = function(context) {
       time <- proc.time() - self$ctxt_start_time
       self$last_update <- NULL
@@ -161,30 +183,33 @@ EvalProgressReporter <- R6::R6Class(
         ))
       }
     },
+
     add_result = function(context, test, result) {
       self$ctxt_n <- self$ctxt_n + 1L
 
       if (expectation_broken(result)) {
-        self$n_fail <- self$n_fail + 1
-        self$ctxt_n_fail <- self$ctxt_n_fail + 1
+        self$res_fail <- c(self$res_fail, 1)
+        self$ctxt_res_fail <- c(self$ctxt_res_fail, 1)
         result$trace <- NULL
         self$ctxt_issues$push(result)
         self$problems$push(result)
       } else if (expectation_skip(result)) {
-        self$n_skip <- self$n_skip + 1
-        self$ctxt_n_skip <- self$ctxt_n_skip + 1
+        self$res_skip <- c(self$res_skip, 1)
+        self$ctxt_res_skip <- c(self$ctxt_res_skip, 1)
         self$skips$push(result)
       } else if (expectation_warning(result)) {
-        self$n_warn <- self$n_warn + 1
-        self$ctxt_n_warn <- self$ctxt_n_warn + 1
+        self$res_warn <- c(self$res_warn, 1)
+        self$ctxt_res_warn <- c(self$ctxt_res_warn, 1)
         self$ctxt_issues$push(result)
       } else {
-        self$n_ok <- self$n_ok + 1
-        self$ctxt_n_ok <- self$ctxt_n_ok + 1
+        self$res_ok <- c(self$res_ok, 1)
+        self$ctxt_res_ok <- c(self$ctxt_res_ok, 1)
       }
 
+      self$update_counts()
       self$show_status()
     },
+
     end_reporter = function() {
       self$cat_line()
 
@@ -222,6 +247,7 @@ EvalProgressReporter <- R6::R6Class(
 
       self$cat_line()
     },
+
     report_issues = function(issues) {
       if (issues$size() > 0) {
         self$rule()
@@ -274,6 +300,8 @@ EvalCompactProgressReporter <- R6::R6Class(
       if (self$ctxt_issues$size() == 0) {
         return()
       }
+
+      browser()
 
       self$cat_line()
       self$cat_line()
