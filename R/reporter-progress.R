@@ -17,7 +17,7 @@
 #' @family reporters
 EvalProgressReporter <- R6::R6Class(
   "EvalProgressReporter",
-  inherit = testthat::Reporter,
+  inherit = testthat::ProgressReporter,
   public = list(
     show_praise = TRUE,
     min_time = 1,
@@ -42,33 +42,6 @@ EvalProgressReporter <- R6::R6Class(
     ctxt_n_fail = 0,
     ctxt_name = "",
     file_name = "",
-    initialize = function(show_praise = TRUE,
-                          max_failures = testthat_max_fails(),
-                          min_time = 1,
-                          update_interval = 0.1,
-                          ...) {
-      super$initialize(...)
-      self$capabilities$parallel_support <- TRUE
-      self$show_praise <- show_praise
-      self$max_fail <- max_failures
-      self$min_time <- min_time
-      self$update_interval <- update_interval
-
-      self$skips <- testthat:::Stack$new()
-      self$problems <- testthat:::Stack$new()
-      self$ctxt_issues <- testthat:::Stack$new()
-
-      # Capture at init so not affected by test settings
-      self$frames <- cli::get_spinner()$frames
-      self$dynamic <- cli::is_dynamic_tty()
-    },
-    is_full = function() {
-      self$n_fail >= self$max_fail
-    },
-    start_reporter = function(context) {
-      self$start_time <- proc.time()
-      self$show_header()
-    },
     start_file = function(file) {
       self$file_name <- file
       self$ctxt_issues <- testthat:::Stack$new()
@@ -95,16 +68,6 @@ EvalProgressReporter <- R6::R6Class(
         colorize("PASS", "success"),
         colorize(" FAIL", "failure"),
         " | ", "Context"
-      )
-    },
-    status_data = function() {
-      list(
-        n = self$ctxt_n,
-        n_ok = self$ctxt_n_ok,
-        n_fail = self$ctxt_n_fail,
-        n_warn = self$ctxt_n_warn,
-        n_skip = self$ctxt_n_skip,
-        name = self$ctxt_name
       )
     },
     show_status = function(complete = FALSE, time = 0, pad = FALSE) {
@@ -169,13 +132,6 @@ EvalProgressReporter <- R6::R6Class(
         self$cat_tight(self$cr(), message)
       } else {
         self$cat_line(self$cr(), message)
-      }
-    },
-    cr = function() {
-      if (self$dynamic) {
-        "\r"
-      } else {
-        "\n"
       }
     },
     end_context = function(context) {
@@ -277,22 +233,6 @@ EvalProgressReporter <- R6::R6Class(
         self$cat_line()
         self$rule()
       }
-    },
-    should_update = function() {
-      if (self$update_interval == 0) {
-        return(TRUE)
-      }
-      if (identical(self$update_interval, Inf)) {
-        return(FALSE)
-      }
-
-      time <- proc.time()[[3]]
-      if (!is.null(self$last_update) &&
-          (time - self$last_update) < self$update_interval) {
-        return(FALSE)
-      }
-      self$last_update <- time
-      TRUE
     }
   )
 )
