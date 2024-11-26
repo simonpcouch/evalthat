@@ -211,6 +211,7 @@ EvalProgressReporter <- R6::R6Class(
       if (expectation_broken(result)) {
         self$n_fail <- self$n_fail + 1
         self$ctxt_n_fail <- self$ctxt_n_fail + 1
+        result$trace <- NULL
         self$ctxt_issues$push(result)
         self$problems$push(result)
       } else if (expectation_skip(result)) {
@@ -310,7 +311,7 @@ testthat_max_fails <- function() {
 #' @rdname ProgressReporter
 EvalCompactProgressReporter <- R6::R6Class(
   "EvalCompactProgressReporter",
-  inherit = testthat::ProgressReporter,
+  inherit = EvalProgressReporter,
   public = list(
     initialize = function(min_time = Inf, ...) {
       super$initialize(min_time = min_time, ...)
