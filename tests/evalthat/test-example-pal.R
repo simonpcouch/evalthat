@@ -97,3 +97,52 @@ test_that("cli pal collapses ad-hoc enumeration (pt. 2)", {
   expect_match(output, "cli_abort(\n", fixed = TRUE)
   expect_match(output, "\n)$")
 })
+
+test_that("cli pal collapses ad-hoc enumeration (pt. 3)", {
+  cli_pal <- pal::.init_pal("cli")
+  input <- "
+    msg <- \"Creating pre-processing data to finalize unknown parameter\"
+    unk_names <- pset$id[unk]
+    if (length(unk_names) == 1) {
+      msg <- paste0(msg, \": \", unk_names)
+    } else {
+      msg <- paste0(msg, \"s: \", paste0(\"'\", unk_names, \"'\", collapse = \", \"))
+    }
+    rlang::inform(msg)
+  "
+  output <- cli_pal$chat(input)
+
+  expect_r_code(output)
+  expect_match(output, "cli::cli_inform", fixed = TRUE)
+
+  # inlines ad-hoc enumeration in message
+  expect_match(output, "^cli")
+
+  # incorporates inline markup
+  expect_match(output, "{.val {unk_names}}", fixed = TRUE)
+
+  # correctly pluralizes
+  expect_match(output, "parameter{?s}", fixed = TRUE)
+
+  # line breaks in reasonable places
+  expect_match(output, "cli_inform(\n", fixed = TRUE)
+  expect_match(output, "\n)$")
+})
+
+test_that("sprintf-style statements", {
+  cli_pal <- pal::.init_pal("cli")
+  input <- "
+    abort(sprintf(\"No such '%s' function: `%s()`.\", package, name))
+  "
+  output <- cli_pal$chat(input)
+
+  expect_r_code(output)
+  expect_match(output, "cli::cli_abort", fixed = TRUE)
+
+  # begins with the message
+  expect_match(output, "^cli")
+
+  # incorporates inline markup
+  expect_match(output, "{.pkg {package}}", fixed = TRUE)
+  expect_match(output, "{.fn {name}}", fixed = TRUE)
+})
