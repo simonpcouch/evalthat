@@ -250,7 +250,7 @@ EvalProgressReporter <- R6::R6Class(
         self$rule("Terminated early", line = 2)
       }
 
-      #self$save_io()
+      #self$save_results()
 
       if (!self$show_praise || stats::runif(1) > 0.1) {
         return()
@@ -329,7 +329,7 @@ EvalCompactProgressReporter <- R6::R6Class(
 
       self$cat_line()
     },
-    save_io = function() {
+    save_results = function() {
       # remove the file extension
       file <- sub("\\.([^.]*)$", "", self$file_name)
       timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
@@ -369,7 +369,7 @@ EvalCompactProgressReporter <- R6::R6Class(
         }
         self$cat_line()
       }
-      self$save_io()
+      self$save_results()
 
       if (had_feedback) {
         self$cat_line()
