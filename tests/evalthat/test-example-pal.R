@@ -21,8 +21,8 @@ test_that("cli pal works for trivial function call", {
 
 test_that("cli pal works for one-liner", {
   cli_pal <- pal::.init_pal("cli")
-  input <- "rlang::abort(\"`save_pred` can only be used if the initial results saved predictions.\")"
-  output <- cli_pal$chat(input)
+  input <- input("rlang::abort(\"`save_pred` can only be used if the initial results saved predictions.\")")
+  output <- output(cli_pal$chat(input))
 
   expect_r_code(output)
   expect_match(output, "cli::cli_abort")
@@ -36,7 +36,7 @@ test_that("cli pal works for one-liner", {
 
 test_that("cli pal collapses ad-hoc enumeration", {
   cli_pal <- pal::.init_pal("cli")
-  input <- "
+  input <- input("
     extra_grid_params <- glue::single_quote(extra_grid_params)
     extra_grid_params <- glue::glue_collapse(extra_grid_params, sep = \", \")
 
@@ -46,8 +46,8 @@ test_that("cli pal collapses ad-hoc enumeration", {
     )
 
     rlang::abort(msg)
-  "
-  output <- cli_pal$chat(input)
+  ")
+  output <- output(cli_pal$chat(input))
 
   expect_r_code(output)
   expect_match(output, "cli::cli_abort", fixed = TRUE)
@@ -71,14 +71,14 @@ test_that("cli pal collapses ad-hoc enumeration", {
 
 test_that("cli pal collapses ad-hoc enumeration (pt. 2)", {
   cli_pal <- pal::.init_pal("cli")
-  input <- "
+  input <- input("
     rlang::abort(paste0(
       \"The workflow has arguments to be tuned that are missing some \",
       \"parameter objects: \",
       paste0(\"'\", pset$id[!params], \"'\", collapse = \", \")
     ))
-  "
-  output <- cli_pal$chat(input)
+  ")
+  output <- output(cli_pal$chat(input))
 
   expect_r_code(output)
   expect_match(output, "cli::cli_abort", fixed = TRUE)
@@ -100,7 +100,7 @@ test_that("cli pal collapses ad-hoc enumeration (pt. 2)", {
 
 test_that("cli pal collapses ad-hoc enumeration (pt. 3)", {
   cli_pal <- pal::.init_pal("cli")
-  input <- "
+  input <- input("
     msg <- \"Creating pre-processing data to finalize unknown parameter\"
     unk_names <- pset$id[unk]
     if (length(unk_names) == 1) {
@@ -109,8 +109,8 @@ test_that("cli pal collapses ad-hoc enumeration (pt. 3)", {
       msg <- paste0(msg, \"s: \", paste0(\"'\", unk_names, \"'\", collapse = \", \"))
     }
     rlang::inform(msg)
-  "
-  output <- cli_pal$chat(input)
+  ")
+  output <- output(cli_pal$chat(input))
 
   expect_r_code(output)
   expect_match(output, "cli::cli_inform", fixed = TRUE)
@@ -131,10 +131,10 @@ test_that("cli pal collapses ad-hoc enumeration (pt. 3)", {
 
 test_that("sprintf-style statements", {
   cli_pal <- pal::.init_pal("cli")
-  input <- "
+  input <- input("
     abort(sprintf(\"No such '%s' function: `%s()`.\", package, name))
-  "
-  output <- cli_pal$chat(input)
+  ")
+  output <- output(cli_pal$chat(input))
 
   expect_r_code(output)
   expect_match(output, "cli::cli_abort", fixed = TRUE)
