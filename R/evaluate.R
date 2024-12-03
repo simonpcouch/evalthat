@@ -74,7 +74,7 @@ eval_local <- function(path = ".", reporter = NULL, ..., load_package = "source"
 }
 
 # active file ---------
-evaluate_active_file <- function(file = find_active_file(), ...) {
+evaluate_active_file <- function(file = active_eval_file(), ...) {
   pkg <- devtools::as.package(dirname(file))
   withr::local_envvar(devtools::r_env_vars())
   if (is_rstudio_running()) {
@@ -90,12 +90,30 @@ evaluate_active_file <- function(file = find_active_file(), ...) {
   )
 }
 
-find_active_file <- function(arg = "file", call = parent.frame()) {
+active_eval_file <- function(arg = "file", call = parent.frame()) {
   if (!is_rstudio_running()) {
-    cli::cli_abort("Argument {.arg {arg}} is missing, with no default",
-                   call = call)
+    cli::cli_abort(
+      "Argument {.arg {arg}} is missing, with no default",
+      call = call
+    )
   }
-  normalizePath(rstudioapi::getSourceEditorContext()$path)
+  test_file <- normalizePath(rstudioapi::getSourceEditorContext()$path)
+
+  if (!is_eval_file(test_file)) {
+    cli::cli_abort(
+      "The active file must begin with {.field test-} and live in
+       the  {.file tests/evalthat/} directory."
+    )
+  }
+
+  test_file
+}
+
+is_eval_file <- function(path) {
+  dir_name <- dirname(path)
+
+  identical(basename(dir_name), "evalthat") &&
+  grepl("^test-", basename(path))
 }
 
 is_rstudio_running <- function() {
