@@ -294,6 +294,7 @@ EvalCompactProgressReporter <- R6::R6Class(
   "EvalCompactProgressReporter",
   inherit = EvalProgressReporter,
   public = list(
+    evaluating_context = list(),
     initialize = function(min_time = Inf, ...) {
       super$initialize(min_time = min_time, ...)
     },
@@ -309,7 +310,8 @@ EvalCompactProgressReporter <- R6::R6Class(
     start_reporter = function(context) {
     },
     start_context = function(context) {
-      self$cat_line(context)
+      self$evaluating_context <- context
+      self$cat_line(format_context(context))
     },
     end_context = function(context) {
       if (self$ctxt_issues$size() == 0) {
@@ -338,8 +340,24 @@ EvalCompactProgressReporter <- R6::R6Class(
       }
 
       qs::qsave(
-        x = self$io,
+        x = self$result_summary(timestamp),
         file = file.path(results_dir, paste0(timestamp, ".rds"))
+      )
+    },
+    result_summary = function(timestamp) {
+      tibble::tibble(
+        model = self$evaluating_context$model,
+        task = self$evaluating_context$task,
+        evaluating_extras = list(self$evaluating_context[
+          !names(self$evaluating_context) %in% c("model", "task")
+        ]),
+        io = list(self$io),
+        n_fail = self$n_fail,
+        n_ok = self$n_ok,
+        pct = self$n_ok / max(self$n_fail + self$n_ok, 1),
+        timestamp = timestamp,
+        file_hash = hash_file(self$file_name),
+        problems = list(self$problems$as_list())
       )
     },
     end_reporter = function() {

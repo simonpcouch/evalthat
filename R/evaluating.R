@@ -12,16 +12,22 @@
 #' returned invisibly.
 #'
 #' @export
-evaluating <- function(model, task) {
+evaluating <- function(model, task, ...) {
   check_string(task)
   check_string(model)
-  desc <- cli::format_inline(
-    "Evaluating {.field {model}} for {cli::col_blue(task)}."
-  )
+
+  context <- c(list(model = model, task = task), list(...))
 
   reporter <- get_reporter()
   if (!is.null(reporter)) {
-    get_reporter()$.start_context(desc)
+    get_reporter()$.start_context(context)
   }
-  invisible(desc)
+  invisible(format_context(context))
+}
+
+format_context <- function(context) {
+  desc <- cli::format_inline(
+    "Evaluating {.field {context$model}} for {cli::col_blue(context$task)}."
+  )
+  desc
 }
