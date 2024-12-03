@@ -13,6 +13,7 @@ RoxygenNote: 7.3.2
 Imports: 
     cli,
     pkgload,
+    qs,
     R6,
     rlang (>= 1.1.0),
     testthat,

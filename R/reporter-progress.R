@@ -250,6 +250,8 @@ EvalProgressReporter <- R6::R6Class(
         self$rule("Terminated early", line = 2)
       }
 
+      #self$save_io()
+
       if (!self$show_praise || stats::runif(1) > 0.1) {
         return()
       }
@@ -325,6 +327,21 @@ EvalCompactProgressReporter <- R6::R6Class(
 
       self$cat_line()
     },
+    save_io = function() {
+      # remove the file extension
+      file <- sub("\\.([^.]*)$", "", self$file_name)
+      timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
+
+      results_dir <- file.path("_results", file)
+      if (!dir.exists(results_dir)) {
+        dir.create(results_dir, recursive = TRUE)
+      }
+
+      qs::qsave(
+        x = self$io,
+        file = file.path(results_dir, paste0(timestamp, ".rds"))
+      )
+    },
     end_reporter = function() {
       had_feedback <- self$n_fail > 0 || self$n_warn > 0
 
@@ -334,6 +351,7 @@ EvalCompactProgressReporter <- R6::R6Class(
         }
         self$cat_line()
       }
+      self$save_io()
 
       if (had_feedback) {
         self$cat_line()
