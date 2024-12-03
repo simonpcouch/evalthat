@@ -11,8 +11,8 @@ evaluating(
 
 test_that("cli pal works for trivial function call", {
   cli_pal <- pal::.init_pal("cli")
-  input <- "rlang::abort(\"some message\")"
-  output <- cli_pal$chat(input)
+  input <- input("rlang::abort(\"some message\")")
+  output <- output(cli_pal$chat(input))
 
   expect_r_code(output)
   expect_match(output, "cli::cli_abort")

@@ -51,12 +51,13 @@ EvalProgressReporter <- R6::R6Class(
     ctxt_n_warn = 0,
     ctxt_n_fail = 0,
 
+    # inputs and outputs, flagged with `eval_input()` and `eval_output()`
+    io = list(),
+
     start_file = function(file) {
       self$file_name <- file
       self$ctxt_issues <- testthat:::Stack$new()
       self$ctxt_start_time <- proc.time()
-
-      #context_start_file(self$file_name)
     },
 
     update_counts = function() {
@@ -206,6 +207,14 @@ EvalProgressReporter <- R6::R6Class(
         self$ctxt_res_ok <- c(self$ctxt_res_ok, 1)
       }
 
+      # testthat hardcodes its multi-reporter as testthat::MultiReporter,
+      # so we can't add a custom field to the multi-reporter for `$update_io()`.
+      # instead, just `update_io()` each time a result is added (possibly
+      # overwriting previous entries).
+      evalthatenv <- env_get(ns_env("evalthat"), "evalthat_env")
+      self$update_io(evalthatenv$input, test, "input")
+      self$update_io(evalthatenv$output, test, "output")
+
       self$update_counts()
       self$show_status()
     },
@@ -246,6 +255,10 @@ EvalProgressReporter <- R6::R6Class(
       }
 
       self$cat_line()
+    },
+
+    update_io = function(x, test, type) {
+      self$io[[test]][[type]] <- x
     },
 
     report_issues = function(issues) {
@@ -300,8 +313,6 @@ EvalCompactProgressReporter <- R6::R6Class(
       if (self$ctxt_issues$size() == 0) {
         return()
       }
-
-      browser()
 
       self$cat_line()
       self$cat_line()

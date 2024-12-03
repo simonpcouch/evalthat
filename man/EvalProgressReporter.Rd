@@ -24,12 +24,14 @@ designed for use with single files. It's the default reporter for
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-EvalProgressReporter-start_file}{\code{EvalProgressReporter$start_file()}}
+\item \href{#method-EvalProgressReporter-update_counts}{\code{EvalProgressReporter$update_counts()}}
 \item \href{#method-EvalProgressReporter-start_context}{\code{EvalProgressReporter$start_context()}}
 \item \href{#method-EvalProgressReporter-show_header}{\code{EvalProgressReporter$show_header()}}
 \item \href{#method-EvalProgressReporter-show_status}{\code{EvalProgressReporter$show_status()}}
 \item \href{#method-EvalProgressReporter-end_context}{\code{EvalProgressReporter$end_context()}}
 \item \href{#method-EvalProgressReporter-add_result}{\code{EvalProgressReporter$add_result()}}
 \item \href{#method-EvalProgressReporter-end_reporter}{\code{EvalProgressReporter$end_reporter()}}
+\item \href{#method-EvalProgressReporter-update_io}{\code{EvalProgressReporter$update_io()}}
 \item \href{#method-EvalProgressReporter-report_issues}{\code{EvalProgressReporter$report_issues()}}
 \item \href{#method-EvalProgressReporter-clone}{\code{EvalProgressReporter$clone()}}
 }
@@ -62,6 +64,15 @@ designed for use with single files. It's the default reporter for
 \subsection{Method \code{start_file()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$start_file(file)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-EvalProgressReporter-update_counts"></a>}}
+\if{latex}{\out{\hypertarget{method-EvalProgressReporter-update_counts}{}}}
+\subsection{Method \code{update_counts()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$update_counts()}\if{html}{\out{</div>}}
 }
 
 }
@@ -116,6 +127,15 @@ designed for use with single files. It's the default reporter for
 \subsection{Method \code{end_reporter()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$end_reporter()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-EvalProgressReporter-update_io"></a>}}
+\if{latex}{\out{\hypertarget{method-EvalProgressReporter-update_io}{}}}
+\subsection{Method \code{update_io()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$update_io(x, test, type)}\if{html}{\out{</div>}}
 }
 
 }
