@@ -18,5 +18,5 @@ results_read <- function(dir = NULL) {
     res <- vctrs::vec_rbind(res, qs::qread(file))
   }
 
-  res
+  structure(res, class = c("evals_df", class(res)))
 }
