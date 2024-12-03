@@ -31,10 +31,3 @@ output <- function(x) {
 }
 
 evalthat_env <- new_environment()
-
-error_no_reporter <- function(fn, call = caller_env()) {
-  cli::cli_abort(
-    "{.fn {fn}} must be called inside of a testing context.",
-    call = call
-  )
-}
