@@ -335,7 +335,7 @@ EvalCompactProgressReporter <- R6::R6Class(
         io = list(self$io),
         n_fail = self$n_fail,
         n_ok = self$n_ok,
-        pct = self$n_ok / max(self$n_fail + self$n_ok, 1),
+        pct = self$n_ok * 100 / max(self$n_fail + self$n_ok, 1),
         timestamp = timestamp,
         file_hash = hash_file(self$file_name),
         problems = list(self$problems$as_list())
