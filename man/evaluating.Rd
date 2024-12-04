@@ -4,7 +4,7 @@
 \alias{evaluating}
 \title{Set context for evaluation task}
 \usage{
-evaluating(model, task)
+evaluating(model, task, ...)
 }
 \arguments{
 \item{model}{A single string describing the model used to generate output.}
