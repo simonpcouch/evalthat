@@ -189,15 +189,15 @@ EvalProgressReporter <- R6::R6Class(
       tibble::tibble(
         model = self$evaluating_context$model,
         task = self$evaluating_context$task,
-        evaluating_extras = list(self$evaluating_context[
+        context = list(self$evaluating_context[
           !names(self$evaluating_context) %in% c("model", "task")
         ]),
-        io = list(self$io),
+        pct = self$n_ok * 100 / max(self$n_fail + self$n_ok, 1),
         n_fail = self$n_fail,
         n_ok = self$n_ok,
-        pct = self$n_ok * 100 / max(self$n_fail + self$n_ok, 1),
         timestamp = timestamp,
         file_hash = hash_file(self$file_name),
+        io = list(self$io),
         problems = list(self$problems$as_list())
       )
     },
