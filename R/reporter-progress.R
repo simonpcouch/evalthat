@@ -10,6 +10,18 @@
 #' designed for use with single files. It's the default reporter for
 #' [test_file()].
 #'
+#'
+#' @field show_praise Whether to show praise. Will not be shown, even if `TRUE`.
+#'
+#' @field res_ok,res_skip,res_warn,res_fail The same as fields prefixed with
+#' `n_*` in the superclass, but encoded a vector whose sum can be taken to
+#' find the `n_*` values. Enables weights per-expectation.
+#' @field ctxt_res_ok,ctxt_res_skip,ctxt_res_warn,ctxt_res_fail,ctxt_issues,ctxt_n The
+#' same as those without the `ctxt_*` prefix, but per-context.
+#' @field evaluating_context The context set in `evaluating()`.
+#' @field io The inputs and outputs flagged with [input()] and [output()].
+#'
+#' @name EvalReporters
 #' @export
 #' @family reporters
 EvalProgressReporter <- R6::R6Class(
@@ -17,26 +29,42 @@ EvalProgressReporter <- R6::R6Class(
   inherit = testthat::ProgressReporter,
   public = list(
     show_praise = FALSE,
+    ctxt_issues = NULL,
+    ctxt_n = 0,
+    evaluating_context = list(),
+
     res_ok = numeric(),
     res_skip = numeric(),
     res_warn = numeric(),
     res_fail = numeric(),
-    dynamic = FALSE,
-    ctxt_issues = NULL,
-    ctxt_n = 0,
     ctxt_res_ok = numeric(),
     ctxt_res_skip = numeric(),
     ctxt_res_warn = numeric(),
     ctxt_res_fail = numeric(),
-    evaluating_context = list(),
 
-    # many failures are not a reason to stop in this context--will just
-    # result in a poor eval
+    #' @description
+    #' Method overwritting to always return `FALSE`, as failed evals are not
+    #' a reason to stop testing in our context.
     is_full = function() {FALSE},
 
-    # inputs and outputs, flagged with `eval_input()` and `eval_output()`
+    #' @description
+    #' Concatenated inputs and outputs flagged with `input()` and `output()`.
     io = list(),
 
+    #' @description
+    #' Concatenate inputs and outputs flagged with `input()` and `output()`.
+    #'
+    #' @param x The input or output.
+    #' @param test The name of the test chunk.
+    #' @param type One of "input" or "output".
+    update_io = function(x, test, type) {
+      self$io[[test]][[type]] <- x
+    },
+
+    #' @description
+    #' Setup for starting a new test file.
+    #'
+    #' @param file File name.
     start_file = function(file) {
       self$file_name <- file
       self$ctxt_issues <- testthat:::Stack$new()
@@ -45,6 +73,26 @@ EvalProgressReporter <- R6::R6Class(
       self$reset_counts()
     },
 
+    #' @description
+    #' Eval reporters' `n_*` fields are actually tracked by
+    #' maintaining vectors of 1s prefixed with `res_*`. This is to accommodate
+    #' a future extension where weights can be assigned to each pass/fail.
+    #'
+    #' This function updates the `n_*` values based on the `res_*` values.
+    update_counts = function() {
+      self$n_ok <- sum(self$res_ok)
+      self$n_skip <- sum(self$res_skip)
+      self$n_warn <- sum(self$res_warn)
+      self$n_fail <- sum(self$res_fail)
+      self$ctxt_n_ok <- sum(self$ctxt_res_ok)
+      self$ctxt_n_skip <- sum(self$ctxt_res_skip)
+      self$ctxt_n_warn <- sum(self$ctxt_res_warn)
+      self$ctxt_n_fail <- sum(self$ctxt_res_fail)
+    },
+
+    #' @description
+    #' Sets the values of `res_*` fields to `numeric()` and calls
+    #' `update_counts()`.
     reset_counts = function() {
       self$res_ok <- numeric()
       self$res_skip <- numeric()
@@ -58,17 +106,10 @@ EvalProgressReporter <- R6::R6Class(
       self$update_counts()
     },
 
-    update_counts = function() {
-      self$n_ok <- sum(self$res_ok)
-      self$n_skip <- sum(self$res_skip)
-      self$n_warn <- sum(self$res_warn)
-      self$n_fail <- sum(self$res_fail)
-      self$ctxt_n_ok <- sum(self$ctxt_res_ok)
-      self$ctxt_n_skip <- sum(self$ctxt_res_skip)
-      self$ctxt_n_warn <- sum(self$ctxt_res_warn)
-      self$ctxt_n_fail <- sum(self$ctxt_res_fail)
-    },
-
+    #' @description
+    #' Resets counters and initiates a progress bar.
+    #'
+    #' @param context The current test context.
     start_context = function(context) {
       self$evaluating_context <- context
 
@@ -85,6 +126,8 @@ EvalProgressReporter <- R6::R6Class(
       self$show_status()
     },
 
+    #' @description
+    #' Show the header tabulating successes and failures.
     show_header = function() {
       self$cat_line(
         "  ",
@@ -94,6 +137,12 @@ EvalProgressReporter <- R6::R6Class(
       )
     },
 
+    #' @description
+    #' Tabulate successes and failures in the current context.
+    #'
+    #' @param complete Logical.
+    #' @param time Ignored. TODO: remove this?
+    #' @param pad Logical.
     show_status = function(complete = FALSE, time = 0, pad = FALSE) {
       data <- self$status_data()
       if (!complete) {
@@ -150,6 +199,10 @@ EvalProgressReporter <- R6::R6Class(
       }
     },
 
+    #' @description
+    #' Teardown following the test run.
+    #'
+    #' @param context Context from [evaluating()].
     end_context = function(context) {
       time <- proc.time() - self$ctxt_start_time
       self$last_update <- NULL
@@ -165,6 +218,10 @@ EvalProgressReporter <- R6::R6Class(
       self$show_status(complete = TRUE, time = time[[3]])
     },
 
+    #' @description
+    #' Situates the evaluation results in a tibble and saves it to the
+    #' file `eval_file_name/timestamp.rds` using [qs::qread()]. Read individual
+    #' results with [qs::qsave()].
     save_results = function() {
       # remove the file extension and test- prefix
       subdir <- sub("\\.([^.]*)$", "", self$file_name)
@@ -182,6 +239,9 @@ EvalProgressReporter <- R6::R6Class(
       )
     },
 
+    #' Situate evaluation results in a tibble.
+    #'
+    #' @param timestamp DTTM as `format(Sys.time(), "%Y%m%d_%H%M%S")`.
     result_summary = function(timestamp) {
       tibble::tibble(
         model = self$evaluating_context$model,
@@ -199,6 +259,12 @@ EvalProgressReporter <- R6::R6Class(
       )
     },
 
+    #' @description
+    #' Append a given `expect_*()` or `grade_*()` result to the current context.
+    #'
+    #' @param context Context from [evaluating()].
+    #' @param test The name of the test block.
+    #' @param result The `expectation` result, returned by an `expect_` function.
     add_result = function(context, test, result) {
       self$ctxt_n <- self$ctxt_n + 1L
 
@@ -233,6 +299,8 @@ EvalProgressReporter <- R6::R6Class(
       self$show_status()
     },
 
+    #' @description
+    #' Tear down the current reporter.
     end_reporter = function() {
       self$cat_line()
 
@@ -255,10 +323,10 @@ EvalProgressReporter <- R6::R6Class(
       self$cat_line()
     },
 
-    update_io = function(x, test, type) {
-      self$io[[test]][[type]] <- x
-    },
-
+    #' @description
+    #' Print issues to the screen.
+    # TODO: should this be removed? or made to return nothing?
+    #' @param issues Issues.
     report_issues = function(issues) {
       if (issues$size() > 0) {
         self$rule()
@@ -285,14 +353,24 @@ testthat_max_fails <- function() {
 }
 
 #' @export
-#' @rdname ProgressReporter
+#' @rdname EvalReporters
 EvalCompactProgressReporter <- R6::R6Class(
   "EvalCompactProgressReporter",
   inherit = EvalProgressReporter,
   public = list(
+    #' @description
+    #' Sets minimum time to infinity.
+    #'
+    #' @param min_time A numeric. Defaults to `Inf`.
+    #' @param ... Passed on to `super$initialize()`.
     initialize = function(min_time = Inf, ...) {
       super$initialize(min_time = min_time, ...)
     },
+
+    #' @description
+    #' Setup for a single file.
+    #'
+    #' @param name File name.
     start_file = function(name) {
       if (!self$rstudio) {
         self$cat_line()
@@ -302,12 +380,27 @@ EvalCompactProgressReporter <- R6::R6Class(
       self$ctxt_issues <- testthat:::Stack$new()
       self$ctxt_start_time <- proc.time()
     },
+
+    #' @description
+    #' Setup.
+    #'
+    #' @param context Context, formed from `evaluating()`.
     start_reporter = function(context) {
     },
+
+    #' @description
+    #' Setup.
+    #'
+    #' @param context Context, formed from `evaluating()`.
     start_context = function(context) {
       self$evaluating_context <- context
       self$cat_line(format_context(context))
     },
+
+    #' @description
+    #' Teardown.
+    #'
+    #' @param context Context, formed from `evaluating()`.
     end_context = function(context) {
       if (self$ctxt_issues$size() == 0) {
         return()
@@ -320,10 +413,18 @@ EvalCompactProgressReporter <- R6::R6Class(
         "See {.field problems} in {.fun results_read} for more information on failures."
       ))
     },
+
+    #' @description
+    #' Teardown.
     end_reporter = function() {
       self$save_results()
       self$cat_line()
     },
+
+    #' @description
+    #' Show current status.
+    #'
+    #' @param complete Ignored.
     show_status = function(complete = NULL) {
       self$local_user_output()
       status <- summary_line(self$n_fail, self$n_warn, self$n_skip, self$n_ok)

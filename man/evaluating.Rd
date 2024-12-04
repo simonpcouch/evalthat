@@ -10,6 +10,8 @@ evaluating(model, task, ...)
 \item{model}{A single string describing the model used to generate output.}
 
 \item{task}{A single string describing the task being evaluated on.}
+
+\item{...}{TODO: document}
 }
 \description{
 This helper is analogous to \code{testthat::context()} and sets metadata
