@@ -11,10 +11,6 @@ evaluating(model, task, ...)
 
 \item{task}{A single string describing the task being evaluated on.}
 }
-\value{
-A description of the format "Evaluating {model} for {task}",
-returned invisibly.
-}
 \description{
 This helper is analogous to \code{testthat::context()} and sets metadata
 for the test for logging.

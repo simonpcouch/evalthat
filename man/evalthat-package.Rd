@@ -4,9 +4,9 @@
 \name{evalthat-package}
 \alias{evalthat}
 \alias{evalthat-package}
-\title{evalthat: Testthat-Style LLM Evaluation}
+\title{evalthat: LLM Evaluation in R}
 \description{
-Testthat-Style LLM Evaluation
+Provides testthat-style utilities for evaluating large language models in R. Score models with non-deterministic output using a unit test interface.
 }
 \seealso{
 Useful links:

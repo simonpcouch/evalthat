@@ -6,10 +6,7 @@
 #'
 #' @param model A single string describing the model used to generate output.
 #' @param task A single string describing the task being evaluated on.
-#'
-#' @returns
-#' A description of the format "Evaluating {model} for {task}",
-#' returned invisibly.
+#' @param ... TODO: document
 #'
 #' @export
 evaluating <- function(model, task, ...) {
