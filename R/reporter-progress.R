@@ -31,6 +31,7 @@ EvalProgressReporter <- R6::R6Class(
     ctxt_res_skip = numeric(),
     ctxt_res_warn = numeric(),
     ctxt_res_fail = numeric(),
+    evaluating_context = list(),
 
     # many failures are not a reason to stop in this context--will just
     # result in a poor eval
@@ -72,6 +73,8 @@ EvalProgressReporter <- R6::R6Class(
     },
 
     start_context = function(context) {
+      self$evaluating_context <- context
+
       self$ctxt_name <- context
       self$ctxt_issues <- testthat:::Stack$new()
 
@@ -160,7 +163,43 @@ EvalProgressReporter <- R6::R6Class(
         return()
       }
 
+      self$save_results()
+
       self$show_status(complete = TRUE, time = time[[3]])
+    },
+
+    save_results = function() {
+      # remove the file extension and test- prefix
+      subdir <- sub("\\.([^.]*)$", "", self$file_name)
+      subdir <- sub("^test-", "", subdir)
+      timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
+
+      results_dir <- file.path("_results", subdir)
+      if (!dir.exists(results_dir)) {
+        dir.create(results_dir, recursive = TRUE)
+      }
+
+      qs::qsave(
+        x = self$result_summary(timestamp),
+        file = file.path(results_dir, paste0(timestamp, ".rds"))
+      )
+    },
+
+    result_summary = function(timestamp) {
+      tibble::tibble(
+        model = self$evaluating_context$model,
+        task = self$evaluating_context$task,
+        evaluating_extras = list(self$evaluating_context[
+          !names(self$evaluating_context) %in% c("model", "task")
+        ]),
+        io = list(self$io),
+        n_fail = self$n_fail,
+        n_ok = self$n_ok,
+        pct = self$n_ok * 100 / max(self$n_fail + self$n_ok, 1),
+        timestamp = timestamp,
+        file_hash = hash_file(self$file_name),
+        problems = list(self$problems$as_list())
+      )
     },
 
     add_result = function(context, test, result) {
@@ -254,7 +293,6 @@ EvalCompactProgressReporter <- R6::R6Class(
   "EvalCompactProgressReporter",
   inherit = EvalProgressReporter,
   public = list(
-    evaluating_context = list(),
     initialize = function(min_time = Inf, ...) {
       super$initialize(min_time = min_time, ...)
     },
@@ -288,37 +326,6 @@ EvalCompactProgressReporter <- R6::R6Class(
       self$cat_tight(paste(summary, collapse = "\n\n"))
 
       self$cat_line()
-    },
-    save_results = function() {
-      # remove the file extension
-      file <- sub("\\.([^.]*)$", "", self$file_name)
-      timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
-
-      results_dir <- file.path("_results", file)
-      if (!dir.exists(results_dir)) {
-        dir.create(results_dir, recursive = TRUE)
-      }
-
-      qs::qsave(
-        x = self$result_summary(timestamp),
-        file = file.path(results_dir, paste0(timestamp, ".rds"))
-      )
-    },
-    result_summary = function(timestamp) {
-      tibble::tibble(
-        model = self$evaluating_context$model,
-        task = self$evaluating_context$task,
-        evaluating_extras = list(self$evaluating_context[
-          !names(self$evaluating_context) %in% c("model", "task")
-        ]),
-        io = list(self$io),
-        n_fail = self$n_fail,
-        n_ok = self$n_ok,
-        pct = self$n_ok * 100 / max(self$n_fail + self$n_ok, 1),
-        timestamp = timestamp,
-        file_hash = hash_file(self$file_name),
-        problems = list(self$problems$as_list())
-      )
     },
     end_reporter = function() {
       had_feedback <- self$n_fail > 0 || self$n_warn > 0
