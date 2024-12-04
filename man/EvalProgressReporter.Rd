@@ -9,9 +9,6 @@ give you actionable insights to help you understand the status of your
 code. This reporter also praises you from time-to-time if all your tests
 pass. It's the default reporter for \code{\link[=test_dir]{test_dir()}}.
 
-\code{EvalParallelProgressReporter} is very similar to \code{EvalProgressReporter}, but
-works better for packages that want parallel tests.
-
 \code{EvalCompactProgressReporter} is a minimal version of \code{EvalProgressReporter}
 designed for use with single files. It's the default reporter for
 \code{\link[=test_file]{test_file()}}.
@@ -23,12 +20,16 @@ designed for use with single files. It's the default reporter for
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
+\item \href{#method-EvalProgressReporter-is_full}{\code{EvalProgressReporter$is_full()}}
 \item \href{#method-EvalProgressReporter-start_file}{\code{EvalProgressReporter$start_file()}}
+\item \href{#method-EvalProgressReporter-reset_counts}{\code{EvalProgressReporter$reset_counts()}}
 \item \href{#method-EvalProgressReporter-update_counts}{\code{EvalProgressReporter$update_counts()}}
 \item \href{#method-EvalProgressReporter-start_context}{\code{EvalProgressReporter$start_context()}}
 \item \href{#method-EvalProgressReporter-show_header}{\code{EvalProgressReporter$show_header()}}
 \item \href{#method-EvalProgressReporter-show_status}{\code{EvalProgressReporter$show_status()}}
 \item \href{#method-EvalProgressReporter-end_context}{\code{EvalProgressReporter$end_context()}}
+\item \href{#method-EvalProgressReporter-save_results}{\code{EvalProgressReporter$save_results()}}
+\item \href{#method-EvalProgressReporter-result_summary}{\code{EvalProgressReporter$result_summary()}}
 \item \href{#method-EvalProgressReporter-add_result}{\code{EvalProgressReporter$add_result()}}
 \item \href{#method-EvalProgressReporter-end_reporter}{\code{EvalProgressReporter$end_reporter()}}
 \item \href{#method-EvalProgressReporter-update_io}{\code{EvalProgressReporter$update_io()}}
@@ -51,7 +52,6 @@ designed for use with single files. It's the default reporter for
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="update"><a href='../../testthat/html/Reporter.html#method-Reporter-update'><code>testthat::Reporter$update()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="ProgressReporter" data-id="cr"><a href='../../testthat/html/ProgressReporter.html#method-ProgressReporter-cr'><code>testthat::ProgressReporter$cr()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="ProgressReporter" data-id="initialize"><a href='../../testthat/html/ProgressReporter.html#method-ProgressReporter-initialize'><code>testthat::ProgressReporter$initialize()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="ProgressReporter" data-id="is_full"><a href='../../testthat/html/ProgressReporter.html#method-ProgressReporter-is_full'><code>testthat::ProgressReporter$is_full()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="ProgressReporter" data-id="should_update"><a href='../../testthat/html/ProgressReporter.html#method-ProgressReporter-should_update'><code>testthat::ProgressReporter$should_update()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="ProgressReporter" data-id="start_reporter"><a href='../../testthat/html/ProgressReporter.html#method-ProgressReporter-start_reporter'><code>testthat::ProgressReporter$start_reporter()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="ProgressReporter" data-id="status_data"><a href='../../testthat/html/ProgressReporter.html#method-ProgressReporter-status_data'><code>testthat::ProgressReporter$status_data()</code></a></span></li>
@@ -59,11 +59,29 @@ designed for use with single files. It's the default reporter for
 </details>
 }}
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-EvalProgressReporter-is_full"></a>}}
+\if{latex}{\out{\hypertarget{method-EvalProgressReporter-is_full}{}}}
+\subsection{Method \code{is_full()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$is_full()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-EvalProgressReporter-start_file"></a>}}
 \if{latex}{\out{\hypertarget{method-EvalProgressReporter-start_file}{}}}
 \subsection{Method \code{start_file()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$start_file(file)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-EvalProgressReporter-reset_counts"></a>}}
+\if{latex}{\out{\hypertarget{method-EvalProgressReporter-reset_counts}{}}}
+\subsection{Method \code{reset_counts()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$reset_counts()}\if{html}{\out{</div>}}
 }
 
 }
@@ -109,6 +127,24 @@ designed for use with single files. It's the default reporter for
 \subsection{Method \code{end_context()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$end_context(context)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-EvalProgressReporter-save_results"></a>}}
+\if{latex}{\out{\hypertarget{method-EvalProgressReporter-save_results}{}}}
+\subsection{Method \code{save_results()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$save_results()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-EvalProgressReporter-result_summary"></a>}}
+\if{latex}{\out{\hypertarget{method-EvalProgressReporter-result_summary}{}}}
+\subsection{Method \code{result_summary()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$result_summary(timestamp)}\if{html}{\out{</div>}}
 }
 
 }

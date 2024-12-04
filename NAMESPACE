@@ -2,7 +2,6 @@
 
 S3method(autoplot,evals_df)
 export(EvalCompactProgressReporter)
-export(EvalParallelProgressReporter)
 export(EvalProgressReporter)
 export(autoplot)
 export(evaluating)

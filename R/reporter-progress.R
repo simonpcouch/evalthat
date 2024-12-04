@@ -6,9 +6,6 @@
 #' code. This reporter also praises you from time-to-time if all your tests
 #' pass. It's the default reporter for [test_dir()].
 #'
-#' `EvalParallelProgressReporter` is very similar to `EvalProgressReporter`, but
-#' works better for packages that want parallel tests.
-#'
 #' `EvalCompactProgressReporter` is a minimal version of `EvalProgressReporter`
 #' designed for use with single files. It's the default reporter for
 #' [test_file()].
@@ -350,109 +347,6 @@ EvalCompactProgressReporter <- R6::R6Class(
       self$local_user_output()
       status <- summary_line(self$n_fail, self$n_warn, self$n_skip, self$n_ok)
       self$cat_tight(self$cr(), status)
-    }
-  )
-)
-
-# parallel progress reporter -----------------------------------------------
-
-#' @export
-#' @rdname ProgressReporter
-
-EvalParallelProgressReporter <- R6::R6Class(
-  "EvalParallelProgressReporter",
-  inherit = testthat::ProgressReporter,
-  public = list(
-    files = list(),
-    spin_frame = 0L,
-    is_rstudio = FALSE,
-    initialize = function(...) {
-      super$initialize(...)
-      self$capabilities$parallel_support <- TRUE
-      self$capabilities$parallel_updates <- TRUE
-      self$update_interval <- 0.05
-      self$is_rstudio <- Sys.getenv("RSTUDIO", "") == "1"
-    },
-    start_file = function(file)  {
-      if (! file %in% names(self$files)) {
-        self$files[[file]] <- list(
-          issues = testthat:::Stack$new(),
-          n_fail = 0L,
-          n_skip = 0L,
-          n_warn = 0L,
-          n_ok = 0L,
-          name = context_name(file),
-          start_time = proc.time()
-        )
-      }
-      self$file_name <- file
-    },
-    start_context = function(context) {
-      # we'll just silently ignore this
-    },
-    end_context = function(context) {
-      # we'll just silently ignore this
-    },
-    end_file = function() {
-      fsts <- self$files[[self$file_name]]
-      time <- proc.time() - fsts$start_time
-
-      # Workaround for https://github.com/rstudio/rstudio/issues/7649
-      if (self$is_rstudio) {
-        self$cat_tight(strpad(self$cr(), self$width + 1)) # +1 for \r
-      }
-      self$show_status(complete = TRUE, time = time[[3]], pad = TRUE)
-      self$report_issues(fsts$issues)
-
-      self$files[[self$file_name]] <- NULL
-      if (length(self$files)) self$update(force = TRUE)
-    },
-    end_reporter = function() {
-      self$cat_tight(self$cr(), strpad("", self$width))
-      super$end_reporter()
-    },
-    show_header = function() {
-      super$show_header()
-      self$update(force = TRUE)
-    },
-    status_data = function() {
-      self$files[[self$file_name]]
-    },
-    add_result = function(context, test, result) {
-      self$ctxt_n <- self$ctxt_n + 1L
-      file <- self$file_name
-      if (expectation_broken(result)) {
-        self$n_fail <- self$n_fail + 1
-        self$files[[file]]$n_fail <- self$files[[file]]$n_fail + 1L
-        self$files[[file]]$issues$push(result)
-        self$problems$push(result)
-      } else if (expectation_skip(result)) {
-        self$n_skip <- self$n_skip + 1
-        self$files[[file]]$n_skip <- self$files[[file]]$n_skip + 1L
-        self$skips$push(result)
-      } else if (expectation_warning(result)) {
-        self$n_warn <- self$n_warn + 1
-        self$files[[file]]$n_warn <- self$files[[file]]$n_warn + 1L
-        self$files[[file]]$issues$push(result)
-      } else {
-        self$n_ok <- self$n_ok + 1
-        self$files[[file]]$n_ok <- self$files[[file]]$n_ok + 1
-      }
-    },
-    update = function(force = FALSE) {
-      if (!force && !self$should_update()) return()
-      self$spin_frame <- self$spin_frame + 1L
-      status <- spinner(self$frames, self$spin_frame)
-
-      message <- paste(
-        status,
-        summary_line(self$n_fail, self$n_warn, self$n_skip, self$n_ok),
-        if (length(self$files) > 0) "@" else "Starting up...",
-        paste(context_name(names(self$files)), collapse = ", ")
-      )
-      message <- strpad(message, self$width)
-      message <- cli::ansi_substr(message, 1, self$width)
-      self$cat_tight(self$cr(), message)
     }
   )
 )
