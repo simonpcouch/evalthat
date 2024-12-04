@@ -40,5 +40,6 @@ autoplot_within <- function(object, ...) {
     ggplot2::geom_histogram() +
     ggplot2::labs(
       subtitle = cli::format_inline("Eval of {model} for {task}")
-    )
+    ) +
+    ggplot2::xlim(0, 1)
 }

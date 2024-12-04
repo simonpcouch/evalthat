@@ -32,6 +32,10 @@ EvalProgressReporter <- R6::R6Class(
     ctxt_res_warn = numeric(),
     ctxt_res_fail = numeric(),
 
+    # many failures are not a reason to stop in this context--will just
+    # result in a poor eval
+    is_full = function() {FALSE},
+
     # inputs and outputs, flagged with `eval_input()` and `eval_output()`
     io = list(),
 
@@ -39,6 +43,21 @@ EvalProgressReporter <- R6::R6Class(
       self$file_name <- file
       self$ctxt_issues <- testthat:::Stack$new()
       self$ctxt_start_time <- proc.time()
+
+      self$reset_counts()
+    },
+
+    reset_counts = function() {
+      self$res_ok <- numeric()
+      self$res_skip <- numeric()
+      self$res_warn <- numeric()
+      self$res_fail <- numeric()
+      self$ctxt_res_ok <- numeric()
+      self$ctxt_res_skip <- numeric()
+      self$ctxt_res_warn <- numeric()
+      self$ctxt_res_fail <- numeric()
+
+      self$update_counts()
     },
 
     update_counts = function() {
@@ -68,7 +87,7 @@ EvalProgressReporter <- R6::R6Class(
 
     show_header = function() {
       self$cat_line(
-        colorize(cli::symbol$tick, "success"), " | ",
+        "  ",
         colorize("PASS", "success"),
         colorize(" FAIL", "failure"),
         " | ", "Context"
@@ -77,22 +96,13 @@ EvalProgressReporter <- R6::R6Class(
 
     show_status = function(complete = FALSE, time = 0, pad = FALSE) {
       data <- self$status_data()
-      if (complete) {
-        if (self$n_fail > 0) {
-          status <- cli::col_red(cli::symbol$cross)
-        } else {
-          status <- cli::col_green(cli::symbol$tick)
-        }
-      } else {
+      if (!complete) {
         if (!self$should_update()) {
           return()
         }
         status <- spinner(self$frames, data$n)
-        if (self$n_fail > 0) {
-          status <- colorize(status, "failure")
-        } else if (self$n_warn > 0) {
-          status <- colorize(status, "warning")
-        }
+      } else {
+        status <- cli::format_inline("\u2713")
       }
 
       col_format <- function(n, type) {
@@ -112,16 +122,18 @@ EvalProgressReporter <- R6::R6Class(
       }
 
       message <- paste0(
-        status, " | ",
+        status, " ",
         sprintf("%4d", self$n_ok), " ",
         sprintf("%4d", self$n_fail),
-        " | ", data$name
+        " | ", cli::ansi_collapse(data$name, sep2 = " for ")
       )
 
-      if (complete && time > self$min_time) {
+      if (complete) {
         message <- paste0(
           message,
-          cli::col_grey(sprintf(" [%.1fs]", time))
+          " (",
+          color_gradient(self$n_ok / max(self$n_fail + self$n_ok, 1)),
+          ")"
         )
       }
 
@@ -149,21 +161,6 @@ EvalProgressReporter <- R6::R6Class(
       }
 
       self$show_status(complete = TRUE, time = time[[3]])
-      # TODO: this previously reported issues during testing, but felt
-      # excessive since failures are also reported after
-      #self$report_issues(self$ctxt_issues)
-
-      if (self$is_full()) {
-        snapshotter <- get_snapshotter()
-        if (!is.null(snapshotter)) {
-          snapshotter$end_file()
-        }
-
-        stop_reporter(c(
-          "Maximum number of failures exceeded; quitting at end of file.",
-          i = "Increase this number with (e.g.) {.run testthat::set_max_fails(Inf)}"
-        ))
-      }
     },
 
     add_result = function(context, test, result) {
@@ -207,7 +204,6 @@ EvalProgressReporter <- R6::R6Class(
         colorize(n, if (n == 0) "success" else type)
       }
 
-      self$rule(cli::style_bold("Results"), line = 2)
       time <- proc.time() - self$start_time
       if (time[[3]] > self$min_time) {
         self$cat_line("Duration: ", sprintf("%.1f s", time[[3]]), col = "cyan")
@@ -215,26 +211,9 @@ EvalProgressReporter <- R6::R6Class(
       }
 
       if (self$problems$size() > 0) {
-        problems <- self$problems$as_list()
-        self$rule("Failed evals", line = 1)
-        for (problem in problems) {
-          self$cat_line(issue_summary(problem))
-          self$cat_line()
-        }
-      }
-
-      status <- summary_line(self$n_fail, self$n_warn, self$n_skip, self$n_ok)
-      self$cat_line("")
-      self$cat_line(status)
-
-      if (self$is_full()) {
-        self$rule("Terminated early", line = 2)
-      }
-
-      #self$save_results()
-
-      if (!self$show_praise || stats::runif(1) > 0.1) {
-        return()
+        self$cat_tight(cli::format_inline(
+          "See {.field problems} in {.fun results_read} for more information on failures."
+        ))
       }
 
       self$cat_line()
@@ -356,8 +335,6 @@ EvalCompactProgressReporter <- R6::R6Class(
         self$cat_line()
         self$show_status()
         self$cat_line()
-      } else if (self$is_full()) {
-        self$cat_line(" Terminated early")
       } else if (self$n_skip == 0 && !self$rstudio) {
         self$cat_line(cli::style_bold(" Done!"))
       }
@@ -370,7 +347,7 @@ EvalCompactProgressReporter <- R6::R6Class(
   )
 )
 
-# parallel progres reporter -----------------------------------------------
+# parallel progress reporter -----------------------------------------------
 
 #' @export
 #' @rdname ProgressReporter
