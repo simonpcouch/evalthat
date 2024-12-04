@@ -102,7 +102,8 @@ active_eval_file <- function(arg = "file", call = parent.frame()) {
   if (!is_eval_file(test_file)) {
     cli::cli_abort(
       "The active file must begin with {.field test-} and live in
-       the  {.file tests/evalthat/} directory."
+       the  {.file tests/evalthat/} directory.",
+      call = call
     )
   }
 
