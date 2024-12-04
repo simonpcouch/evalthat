@@ -96,3 +96,43 @@ expectation_location <- function(x, prefix = "", suffix = "") {
   filename <- attr(srcref, "srcfile")$filename
   cli::format_inline("{prefix}{.file {filename}:{srcref[1]}:{srcref[2]}}{suffix}")
 }
+
+
+spinner <- function(frames, i) {
+  frames[((i - 1) %% length(frames)) + 1]
+}
+
+issue_header <- function(x, pad = FALSE) {
+  type <- expectation_type(x)
+  if (has_color()) {
+    type <- colorize(first_upper(type), type)
+  } else {
+    type <- first_upper(type)
+  }
+  if (pad) {
+    type <- strpad(type, 7)
+  }
+
+  paste0(type, expectation_location(x, " (", ")"), ": ", x$test)
+}
+
+issue_summary <- function(x, rule = FALSE) {
+  header <- cli::style_bold(issue_header(x))
+  if (rule) {
+    # Don't truncate long test names
+    width <- max(cli::ansi_nchar(header) + 6, getOption("width"))
+    header <- cli::rule(header, width = width)
+  }
+
+  paste0(header, "\n", format(x))
+}
+
+strpad <- function(x, width = cli::console_width()) {
+  n <- pmax(0, width - cli::ansi_nchar(x))
+  paste0(x, strrep(" ", n))
+}
+
+first_upper <- function(x) {
+  substr(x, 1, 1) <- toupper(substr(x, 1, 1))
+  x
+}
