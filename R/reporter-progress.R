@@ -316,32 +316,13 @@ EvalCompactProgressReporter <- R6::R6Class(
       self$cat_line()
       self$cat_line()
 
-      issues <- self$ctxt_issues$as_list()
-      summary <- vapply(issues, issue_summary, rule = TRUE,
-                        FUN.VALUE = character(1)
-      )
-      self$cat_tight(paste(summary, collapse = "\n\n"))
-
-      self$cat_line()
+      self$cat_tight(cli::format_inline(
+        "See {.field problems} in {.fun results_read} for more information on failures."
+      ))
     },
     end_reporter = function() {
-      had_feedback <- self$n_fail > 0 || self$n_warn > 0
-
-      if (self$n_skip > 0) {
-        if (!had_feedback) {
-          self$cat_line()
-        }
-        self$cat_line()
-      }
       self$save_results()
-
-      if (had_feedback) {
-        self$cat_line()
-        self$show_status()
-        self$cat_line()
-      } else if (self$n_skip == 0 && !self$rstudio) {
-        self$cat_line(cli::style_bold(" Done!"))
-      }
+      self$cat_line()
     },
     show_status = function(complete = NULL) {
       self$local_user_output()
