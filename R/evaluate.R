@@ -1,11 +1,13 @@
 # analogous to devtools::test
 evaluate <- function(pkg = ".",
+                     epochs = 1L,
                      filter = NULL,
                      stop_on_failure = FALSE,
                      export_all = TRUE,
                      ...) {
   # devtools:::save_all()
   pkg <- devtools::as.package(pkg)
+  check_number_whole(epochs, min = 1, allow_infinite = FALSE)
   # TODO: implement uses_evaltest
   # if (!uses_testthat(pkg)) {
   #   cli::cli_inform(c(i = "No testing infrastructure found."))
@@ -37,12 +39,14 @@ evaluate <- function(pkg = ".",
   #   },
   #   .package = "testthat"
   # )
+
   eval_local(
     pkg$path,
     filter = filter,
     stop_on_failure = stop_on_failure,
     load_package = load_package,
     reporter = EvalProgressReporter$new(),
+    epochs = epochs,
     ...
   )
 }
@@ -59,17 +63,16 @@ load_package_for_testing <- function(pkg) {
 }
 
 # # analogous to testthat::test_local
-eval_local <- function(path = ".", reporter = NULL, ..., load_package = "source") {
+eval_local <- function(path = ".", reporter = NULL, ..., load_package = "source", epochs = 1L) {
   package <- pkgload::pkg_name(path)
   test_path <- file.path(pkgload::pkg_path(path), "tests", "evalthat")
   withr::local_envvar(NOT_CRAN = "true")
 
-  testthat::test_dir(
-    test_path,
-    package = package,
-    reporter = reporter,
-    ...,
-    load_package = load_package
+  testthat:::test_files(
+    test_dir = test_path,
+    test_package = NULL,
+    test_paths = rep(testthat::find_test_scripts(test_path), each = epochs),
+    reporter = EvalProgressReporter$new()
   )
 }
 
