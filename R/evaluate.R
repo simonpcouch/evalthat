@@ -74,20 +74,33 @@ eval_local <- function(path = ".", reporter = NULL, ..., load_package = "source"
 }
 
 # active file ---------
-evaluate_active_file <- function(file = active_eval_file(), ...) {
+evaluate_active_file <- function(file = active_eval_file(), epochs = 1L, ...) {
+  check_number_whole(epochs, min = 1, allow_infinite = FALSE)
   pkg <- devtools::as.package(dirname(file))
   withr::local_envvar(devtools::r_env_vars())
   if (is_rstudio_running()) {
     rstudioapi::executeCommand("activateConsole", quiet = TRUE)
   }
   load_package <- load_package_for_testing(pkg)
-  testthat::test_file(
-    file,
-    package = pkg$package,
-    load_package = load_package,
-    reporter = EvalCompactProgressReporter$new(),
-    ...
-  )
+  if (identical(epochs, 1L)) {
+    testthat::test_file(
+      file,
+      package = pkg$package,
+      load_package = load_package,
+      reporter = EvalCompactProgressReporter$new(),
+      ...
+    )
+  } else {
+    # todo: does this actually need to be a different reporter? or could
+    # `testthat:::test_files()` be exported?
+    testthat:::test_files(
+      test_dir = "tests/evalthat",
+      test_package = pkg$package,
+      load_package = load_package,
+      test_paths = rep(file, times = epochs),
+      reporter = EvalProgressReporter$new()
+    )
+  }
 }
 
 active_eval_file <- function(arg = "file", call = parent.frame()) {
