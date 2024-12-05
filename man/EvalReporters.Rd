@@ -35,8 +35,6 @@ find the \verb{n_*} values. Enables weights per-expectation.}
 \item{\code{ctxt_res_ok, ctxt_res_skip, ctxt_res_warn, ctxt_res_fail, ctxt_issues, ctxt_n}}{The
 same as those without the \verb{ctxt_*} prefix, but per-context.}
 
-\item{\code{evaluating_context}}{The context set in \code{evaluating()}.}
-
 \item{\code{io}}{The inputs and outputs flagged with \code{\link[=input]{input()}} and \code{\link[=output]{output()}}.}
 }
 \if{html}{\out{</div>}}

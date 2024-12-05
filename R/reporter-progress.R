@@ -22,7 +22,6 @@
 #' find the `n_*` values. Enables weights per-expectation.
 #' @field ctxt_res_ok,ctxt_res_skip,ctxt_res_warn,ctxt_res_fail,ctxt_issues,ctxt_n The
 #' same as those without the `ctxt_*` prefix, but per-context.
-#' @field evaluating_context The context set in `evaluating()`.
 #' @field io The inputs and outputs flagged with [input()] and [output()].
 #'
 #' @name EvalReporters
@@ -35,7 +34,6 @@ EvalProgressReporter <- R6::R6Class(
     show_praise = FALSE,
     ctxt_issues = NULL,
     ctxt_n = 0,
-    evaluating_context = list(),
 
     res_ok = numeric(),
     res_skip = numeric(),
@@ -115,8 +113,6 @@ EvalProgressReporter <- R6::R6Class(
     #'
     #' @param context The current test context.
     start_context = function(context) {
-      self$evaluating_context <- context
-
       self$ctxt_name <- context
       self$ctxt_issues <- testthat:::Stack$new()
 
@@ -248,7 +244,7 @@ EvalProgressReporter <- R6::R6Class(
     #' @param timestamp DTTM as `format(Sys.time(), "%Y%m%d_%H%M%S")`.
     result_summary = function(timestamp) {
       tibble::tibble(
-        evaluating = self$evaluating_context,
+        evaluating = self$ctxt_name,
         pct = self$n_ok * 100 / max(self$n_fail + self$n_ok, 1),
         n_fail = self$n_fail,
         n_ok = self$n_ok,
@@ -389,7 +385,7 @@ EvalCompactProgressReporter <- R6::R6Class(
     #'
     #' @param context Context, formed from `evaluating()`.
     start_context = function(context) {
-      self$evaluating_context <- context
+      self$ctxt_name <- context
       self$show_status()
     },
 
