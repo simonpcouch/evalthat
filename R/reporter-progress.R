@@ -420,7 +420,14 @@ EvalCompactProgressReporter <- R6::R6Class(
     #' @param complete Ignored.
     show_status = function(complete = NULL) {
       self$local_user_output()
-      status <- summary_line(self$n_fail, self$n_warn, self$n_skip, self$n_ok)
+      status <- summary_line(
+        self$n_fail,
+        self$n_warn,
+        self$n_skip,
+        self$n_ok,
+        context = self$ctxt_name,
+        width = self$width
+      )
       self$cat_tight(self$cr(), status)
     }
   )

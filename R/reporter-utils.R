@@ -1,4 +1,4 @@
-summary_line <- function(n_fail, n_warn, n_skip, n_pass) {
+summary_line <- function(n_fail, n_warn, n_skip, n_pass, context, width) {
   colorize_if <- function(text, color, cond) {
     if (cond) colorize(text, color) else text
   }
@@ -10,15 +10,17 @@ summary_line <- function(n_fail, n_warn, n_skip, n_pass) {
     suffix <- paste0(": ", color_gradient(prop))
   }
 
-  paste0(
-    "",
-    colorize_if("PASS", "success", n_pass > 0), " ", n_pass, " | ",
-    colorize_if("FAIL", "failure", n_fail > 0), " ", n_fail,
-    suffix,
-    # append whitespace to "remove" duplicated percentage signs
-    # when percentage formatting reduces nchar
-    "         "
+  strpad(
+    paste0(
+      "",
+      colorize_if("PASS", "success", n_pass > 0), " ", n_pass, " | ",
+      colorize_if("FAIL", "failure", n_fail > 0), " ", n_fail,
+      suffix,
+      ansi_collapse_context(context, width = 20)
+    ),
+    width = width
   )
+
 }
 
 color_gradient <- function(prop) {
