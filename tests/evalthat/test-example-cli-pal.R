@@ -5,8 +5,7 @@ skip_if(identical(Sys.getenv("ANTHROPIC_API_KEY"), ""))
 cli_pal <- pal::.init_pal("cli")
 
 evaluating(
-  cli_pal$.__enclos_env__$private$Chat$.__enclos_env__$private$provider@model,
-  "translating to cli"
+  model = cli_pal$.__enclos_env__$private$Chat$.__enclos_env__$private$provider@model
 )
 
 test_that("cli pal works for trivial function call", {

@@ -32,8 +32,7 @@ example:
 
 ``` r
 evaluating(
-  model = "claude",
-  task = "plotting with ggplot2"
+  model = "claude"
 )
 
 test_that("model can make a basic histogram", {

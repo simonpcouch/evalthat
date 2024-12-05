@@ -40,6 +40,14 @@ color_gradient <- function(prop) {
   cli::make_ansi_style(hex_color)(sprintf("%.1f%%", prop * 100))
 }
 
+# remove directory path, extension, and `test-` prefix
+file_name_to_context <- function(file_name) {
+  res <- basename(file_name)
+  res <- sub("\\.([^.]*)$", "", res)
+  res <- sub("^test-", "", res)
+  res
+}
+
 # copied from testthat ---------------------------------------------------------
 colorize <- function(text, as = c("success", "skip", "warning", "failure", "error")) {
   if (has_color()) {

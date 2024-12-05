@@ -5,8 +5,7 @@ skip_if(identical(Sys.getenv("ANTHROPIC_API_KEY"), ""))
 testthat_pal <- pal::.init_pal("testthat")
 
 evaluating(
-  testthat_pal$.__enclos_env__$private$Chat$.__enclos_env__$private$provider@model,
-  "transitioning to testthat 3e"
+  model = testthat_pal$.__enclos_env__$private$Chat$.__enclos_env__$private$provider@model
 )
 
 test_that("testthat pal works for transitioning to snapshots", {

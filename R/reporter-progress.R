@@ -178,7 +178,9 @@ EvalProgressReporter <- R6::R6Class(
         status, " ",
         sprintf("%4d", self$n_ok), " ",
         sprintf("%4d", self$n_fail),
-        " | ", cli::ansi_collapse(data$name, sep2 = " for ")
+        # TODO: do some fun `ansi_collapse` on information in `evaluating()`
+        # and keep track of the current pct here
+        " | ", file_name_to_context(self$file_name)
       )
 
       if (complete) {
@@ -227,9 +229,7 @@ EvalProgressReporter <- R6::R6Class(
     #' file `eval_file_name/timestamp.rds` using [qs::qread()]. Read individual
     #' results with [qs::qsave()].
     save_results = function() {
-      # remove the file extension and test- prefix
-      subdir <- sub("\\.([^.]*)$", "", self$file_name)
-      subdir <- sub("^test-", "", subdir)
+      subdir <- file_name_to_context(self$file_name)
       timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
 
       results_dir <- file.path("_results", subdir)
@@ -248,11 +248,7 @@ EvalProgressReporter <- R6::R6Class(
     #' @param timestamp DTTM as `format(Sys.time(), "%Y%m%d_%H%M%S")`.
     result_summary = function(timestamp) {
       tibble::tibble(
-        model = self$evaluating_context$model,
-        task = self$evaluating_context$task,
-        context = list(self$evaluating_context[
-          !names(self$evaluating_context) %in% c("model", "task")
-        ]),
+        evaluating = self$evaluating_context,
         pct = self$n_ok * 100 / max(self$n_fail + self$n_ok, 1),
         n_fail = self$n_fail,
         n_ok = self$n_ok,
@@ -376,10 +372,6 @@ EvalCompactProgressReporter <- R6::R6Class(
     #'
     #' @param name File name.
     start_file = function(name) {
-      if (!self$rstudio) {
-        self$cat_line()
-        self$rule(cli::style_bold(paste0("Testing ", name)), line = 2)
-      }
       self$file_name <- name
       self$ctxt_issues <- testthat:::Stack$new()
       self$ctxt_start_time <- proc.time()
@@ -398,7 +390,7 @@ EvalCompactProgressReporter <- R6::R6Class(
     #' @param context Context, formed from `evaluating()`.
     start_context = function(context) {
       self$evaluating_context <- context
-      self$cat_line(format_context(context))
+      self$show_status()
     },
 
     #' @description

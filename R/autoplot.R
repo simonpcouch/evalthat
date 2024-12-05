@@ -15,6 +15,7 @@ autoplot.evals_df <- function(object, ..., type = c("within", "across")) {
 }
 
 autoplot_within <- function(object, ...) {
+  # TODO: all of this metadata is now optional
   model <- object$model[1]
   task <- object$task[1]
   file_hash <- object$file_hash[1]
