@@ -27,7 +27,6 @@
 #' @export
 evaluate <- function(pkg = ".",
                      epochs = 1L,
-                     filter = NULL,
                      ...) {
   # devtools:::save_all()
   pkg <- devtools::as.package(pkg)
@@ -41,7 +40,6 @@ evaluate <- function(pkg = ".",
 
   eval_local(
     pkg$path,
-    filter = filter,
     load_package = load_package,
     reporter = EvalProgressReporter$new(),
     epochs = epochs,
