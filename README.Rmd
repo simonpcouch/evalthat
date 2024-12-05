@@ -121,4 +121,6 @@ ggsave("inst/ex_plot.png", plot, scale = .7)
 
 ```
 
-![A ggplot2 histogram, showing distributions of performance on the task "translating R erroring code to cli" for three different models: Claude 3.5 Sonner, GPT-4o, and GPT-4o-mini. Claude Sonnet 3.5 and GPT-4o with default elmer settings offer comparable performance on average, though GPT-4o's "temperature" is such that the same input always returns the same response.](inst/ex_plot.png)
+```{r, fig.alt='A ggplot2 histogram, showing distributions of performance on the task "translating R erroring code to cli" for three different models: Claude 3.5 Sonner, GPT-4o, and GPT-4o-mini. Claude Sonnet 3.5 and GPT-4o with default elmer settings offer comparable performance on average, though GPT-4o\'s "temperature" is such that the same input always returns the same response.'}
+knitr::include_graphics("inst/ex_plot.png")
+```

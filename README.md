@@ -80,14 +80,14 @@ of it like a snapshot. evalthat supplies a number of helpers for working
 with result files, allowing you to compare performance across various
 models, iterate on prompts, quantify variability in output, and so on:
 
-<figure>
-<img src="inst/ex_plot.png"
-alt="A ggplot2 histogram, showing distributions of performance on the task “translating R erroring code to cli” for three different models: Claude 3.5 Sonner, GPT-4o, and GPT-4o-mini. Claude Sonnet 3.5 and GPT-4o with default elmer settings offer comparable performance on average, though GPT-4o’s “temperature” is such that the same input always returns the same response." />
-<figcaption aria-hidden="true">A ggplot2 histogram, showing
-distributions of performance on the task “translating R erroring code to
+``` r
+knitr::include_graphics("inst/ex_plot.png")
+```
+
+\<img src=“inst/ex_plot.png” alt=“A ggplot2 histogram, showing
+distributions of performance on the task”translating R erroring code to
 cli” for three different models: Claude 3.5 Sonner, GPT-4o, and
 GPT-4o-mini. Claude Sonnet 3.5 and GPT-4o with default elmer settings
 offer comparable performance on average, though GPT-4o’s “temperature”
-is such that the same input always returns the same
-response.</figcaption>
-</figure>
+is such that the same input always returns the same response.”
+width=“100%” /\>
