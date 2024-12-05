@@ -78,21 +78,21 @@ Running the above test file results in a persistent _result file_—think of it 
 ```{r, eval = FALSE, include = FALSE}
 # quick scratch to generate some example. TODO: make this reproducible
 # with `evaluate_file()` and, eventually, transition to `evaluate_across()`.
-evaluate_active_file(repeats = 10)
+evaluate_file("tests/evalthat/test-example-cli-pal.R", repeats = 10)
 
 options(
   .pal_fn = "chat_openai",
   .pal_args = list(model = "gpt-4o-mini")
 )
 
-evaluate_active_file(repeats = 10)
+evaluate_file("tests/evalthat/test-example-cli-pal.R", repeats = 10)
 
 options(
   .pal_fn = "chat_openai",
   .pal_args = list(model = "gpt-4o")
 )
 
-evaluate_active_file(repeats = 10)
+evaluate_file("tests/evalthat/test-example-cli-pal.R", repeats = 10)
 
 library(tidyverse)
 

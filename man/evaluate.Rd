@@ -3,11 +3,14 @@
 \name{evaluate}
 \alias{evaluate}
 \alias{evaluate_active_file}
+\alias{evaluate_file}
 \title{Evaluate LLM performance}
 \usage{
 evaluate(pkg = ".", repeats = 1L, ...)
 
 evaluate_active_file(file = active_eval_file(), repeats = 1L, ...)
+
+evaluate_file(file, repeats = 1L, ...)
 }
 \arguments{
 \item{pkg, file}{Path to the package or file in question. Optional.}
@@ -29,8 +32,9 @@ via \code{\link[=results_read]{results_read()}} and friends.
 }
 }
 \description{
-\code{evaluate()} and \code{evaluate_active_file()} are roughly analogous to
-\code{\link[devtools:test]{devtools::test()}} and \code{\link[devtools:test]{devtools::test_active_file()}}, respectively.
+\code{evaluate()}, \code{evaluate_file()}, \code{evaluate_active_file()} are roughly
+analogous to \code{\link[devtools:test]{devtools::test()}}, \code{\link[devtools:devtools-deprecated]{devtools::test_file()}}, and
+\code{\link[devtools:test]{devtools::test_active_file()}}, respectively.
 Interface with them in the same way that you would with their devtools
 friends, though note the \code{repeats} argument—assuming that the models you're
 evaluating provide non-deterministic output, running the same test files

@@ -1,8 +1,9 @@
 #' Evaluate LLM performance
 #'
 #' @description
-#' `evaluate()` and `evaluate_active_file()` are roughly analogous to
-#' [devtools::test()] and [devtools::test_active_file()], respectively.
+#' `evaluate()`, `evaluate_file()`, `evaluate_active_file()` are roughly
+#' analogous to [devtools::test()], [devtools::test_file()], and
+#' [devtools::test_active_file()], respectively.
 #' Interface with them in the same way that you would with their devtools
 #' friends, though note the `repeats` argument—assuming that the models you're
 #' evaluating provide non-deterministic output, running the same test files
@@ -50,12 +51,18 @@ evaluate <- function(pkg = ".",
 #' @rdname evaluate
 #' @export
 evaluate_active_file <- function(file = active_eval_file(), repeats = 1L, ...) {
-  check_number_whole(repeats, min = 1, allow_infinite = FALSE)
+  evaluate_file_impl(file = file, repeats = repeats, ...)
+}
+
+#' @rdname evaluate
+evaluate_file <- function(file, repeats = 1L, ...) {
+  evaluate_file_impl(file = file, repeats = repeats, ...)
+}
+
+evaluate_file_impl <- function(file, repeats, ..., call = caller_env()) {
+  check_number_whole(repeats, min = 1, allow_infinite = FALSE, call = call)
   pkg <- devtools::as.package(dirname(file))
   withr::local_envvar(devtools::r_env_vars())
-  if (is_rstudio_running()) {
-    rstudioapi::executeCommand("activateConsole", quiet = TRUE)
-  }
   load_package <- load_package_for_testing(pkg)
   if (identical(repeats, 1L)) {
     testthat::test_file(
