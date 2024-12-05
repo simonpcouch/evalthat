@@ -248,7 +248,7 @@ EvalProgressReporter <- R6::R6Class(
         evaluating = self$ctxt_name,
         pct = self$n_ok * 100 / max(self$n_fail + self$n_ok, 1),
         n_fail = self$n_fail,
-        n_ok = self$n_ok,
+        n_pass = self$n_ok,
         timestamp = timestamp,
         file_hash = hash_file(self$file_name),
         io = list(self$io),
