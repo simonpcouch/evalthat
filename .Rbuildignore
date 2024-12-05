@@ -4,3 +4,5 @@
 ^README\.Rmd$
 ^cran-comments\.md$
 tests/evalthat/_results
+
+inst/ex_plot.png

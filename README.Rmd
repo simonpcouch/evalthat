@@ -73,4 +73,52 @@ testthat users will notice a couple changes:
 * The functions `input()` and `output()` flag "what went into the model?" and "what came out?"
 * In addition to the regular `expect_*()` functions from testthat, the package supplies a number of new expectation functions that are helpful in evaluating R code contained in a character string (as it will be when outputted from elmer or its extensions). Those that begin with `expect_*()` are automated, those that begin with `grade_*()` are less-so.
 
-Running the above test file results in a persistent _result file_—think of it like a snapshot. evalthat supplies a number of helpers for working with result files, allowing you to compare performance across various models, iterate on prompts, quantify variability in output, and so on.
+Running the above test file results in a persistent _result file_—think of it like a snapshot. evalthat supplies a number of helpers for working with result files, allowing you to compare performance across various models, iterate on prompts, quantify variability in output, and so on:
+
+```{r, eval = FALSE, include = FALSE}
+# quick scratch to generate some example. TODO: make this reproducible
+# with `evaluate_file()` and, eventually, transition to `evaluate_across()`.
+evaluate_active_file(epochs = 10)
+
+options(
+  .pal_fn = "chat_openai",
+  .pal_args = list(model = "gpt-4o-mini")
+)
+
+evaluate_active_file(epochs = 10)
+
+options(
+  .pal_fn = "chat_openai",
+  .pal_args = list(model = "gpt-4o")
+)
+
+evaluate_active_file(epochs = 10)
+
+library(tidyverse)
+
+plot <- res %>% 
+  unnest(evaluating) %>%
+  ggplot() +
+  aes(x = pct, fill = evaluating) +
+  geom_histogram(position = "identity", alpha = .5) +
+  xlim(c(0, 100)) +
+  labs(
+    fill = "Model",
+    x = "Score",
+    y = "Count",
+    title = "LLM performance in translating R erroring code to cli",
+    caption = 
+      "Claude Sonnet 3.5 and GPT-4o with default elmer settings offer 
+       comparable performance on average, though GPT-4o's 'temperature'
+       is such that the same input always returns the same response."
+  ) +
+  scale_fill_viridis_d(end = .7) +
+  theme(legend.position = c(0.15, 0.75))
+
+plot
+
+ggsave("inst/ex_plot.png", plot, scale = .7)
+
+```
+
+![A ggplot2 histogram, showing distributions of performance on the task "translating R erroring code to cli" for three different models: Claude 3.5 Sonner, GPT-4o, and GPT-4o-mini. Claude Sonnet 3.5 and GPT-4o with default elmer settings offer comparable performance on average, though GPT-4o's "temperature" is such that the same input always returns the same response.](inst/ex_plot.png)
