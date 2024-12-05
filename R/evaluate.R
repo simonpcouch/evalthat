@@ -4,13 +4,13 @@
 #' `evaluate()` and `evaluate_active_file()` are roughly analogous to
 #' [devtools::test()] and [devtools::test_active_file()], respectively.
 #' Interface with them in the same way that you would with their devtools
-#' friends, though note the `epochs` argument—assuming that the models you're
+#' friends, though note the `repeats` argument—assuming that the models you're
 #' evaluating provide non-deterministic output, running the same test files
-#' multiple times by setting `epochs > 1` will help you quantify the
+#' multiple times by setting `repeats > 1` will help you quantify the
 #' variability of your evaluations.
 #'
-#' @param epochs A single positive integer specifying the number of
-#' evaluation epochs, or repeats over the same test files.
+#' @param repeats A single positive integer specifying the number of
+#' evaluation repeats, or runs over the same test files.
 #' @param pkg,file Path to the package or file in question. Optional.
 #  TODO: actually implement this
 #' @param filter A string or pattern to filter test files. Optional.
@@ -26,11 +26,11 @@
 #'
 #' @export
 evaluate <- function(pkg = ".",
-                     epochs = 1L,
+                     repeats = 1L,
                      ...) {
   # devtools:::save_all()
   pkg <- devtools::as.package(pkg)
-  check_number_whole(epochs, min = 1, allow_infinite = FALSE)
+  check_number_whole(repeats, min = 1, allow_infinite = FALSE)
 
     # TODO: implement uses_evaltest and use_evalthat
 
@@ -42,22 +42,22 @@ evaluate <- function(pkg = ".",
     pkg$path,
     load_package = load_package,
     reporter = EvalProgressReporter$new(),
-    epochs = epochs,
+    repeats = repeats,
     ...
   )
 }
 
 #' @rdname evaluate
 #' @export
-evaluate_active_file <- function(file = active_eval_file(), epochs = 1L, ...) {
-  check_number_whole(epochs, min = 1, allow_infinite = FALSE)
+evaluate_active_file <- function(file = active_eval_file(), repeats = 1L, ...) {
+  check_number_whole(repeats, min = 1, allow_infinite = FALSE)
   pkg <- devtools::as.package(dirname(file))
   withr::local_envvar(devtools::r_env_vars())
   if (is_rstudio_running()) {
     rstudioapi::executeCommand("activateConsole", quiet = TRUE)
   }
   load_package <- load_package_for_testing(pkg)
-  if (identical(epochs, 1L)) {
+  if (identical(repeats, 1L)) {
     testthat::test_file(
       file,
       package = pkg$package,
@@ -72,7 +72,7 @@ evaluate_active_file <- function(file = active_eval_file(), epochs = 1L, ...) {
       test_dir = "tests/evalthat",
       test_package = pkg$package,
       load_package = load_package,
-      test_paths = rep(file, times = epochs),
+      test_paths = rep(file, times = repeats),
       reporter = EvalProgressReporter$new()
     )
   }
@@ -90,7 +90,7 @@ load_package_for_testing <- function(pkg) {
 }
 
 # # analogous to testthat::test_local
-eval_local <- function(path = ".", reporter = NULL, ..., load_package = "source", epochs = 1L) {
+eval_local <- function(path = ".", reporter = NULL, ..., load_package = "source", repeats = 1L) {
   package <- pkgload::pkg_name(path)
   test_path <- file.path(pkgload::pkg_path(path), "tests", "evalthat")
   withr::local_envvar(NOT_CRAN = "true")
@@ -98,7 +98,7 @@ eval_local <- function(path = ".", reporter = NULL, ..., load_package = "source"
   testthat:::test_files(
     test_dir = test_path,
     test_package = NULL,
-    test_paths = rep(testthat::find_test_scripts(test_path), each = epochs),
+    test_paths = rep(testthat::find_test_scripts(test_path), each = repeats),
     reporter = EvalProgressReporter$new(),
     ...
   )

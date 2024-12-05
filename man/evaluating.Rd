@@ -4,15 +4,11 @@
 \alias{evaluating}
 \title{Set context for evaluation}
 \usage{
-evaluating(model, task, ...)
+evaluating(...)
 }
 \arguments{
-\item{model}{A single string describing the model used to generate output.}
-
-\item{task}{A single string describing the task being evaluated on.}
-
-\item{...}{Additional named fields describing eval metadata, e.g. the prompt
-version, model provider, etc.}
+\item{...}{Named fields describing eval metadata, e.g. the model provider,
+model, prompt version, model provider, etc.}
 }
 \description{
 This helper is analogous to \code{\link[testthat:context]{testthat::context()}} and sets metadata

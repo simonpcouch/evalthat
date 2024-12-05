@@ -5,19 +5,19 @@
 \alias{evaluate_active_file}
 \title{Evaluate LLM performance}
 \usage{
-evaluate(pkg = ".", epochs = 1L, filter = NULL, ...)
+evaluate(pkg = ".", repeats = 1L, ...)
 
-evaluate_active_file(file = active_eval_file(), epochs = 1L, ...)
+evaluate_active_file(file = active_eval_file(), repeats = 1L, ...)
 }
 \arguments{
 \item{pkg, file}{Path to the package or file in question. Optional.}
 
-\item{epochs}{A single positive integer specifying the number of
-evaluation epochs, or repeats over the same test files.}
-
-\item{filter}{A string or pattern to filter test files. Optional.}
+\item{repeats}{A single positive integer specifying the number of
+evaluation repeats, or runs over the same test files.}
 
 \item{...}{Additional arguments passed to \code{testthat:::test_files()}.}
+
+\item{filter}{A string or pattern to filter test files. Optional.}
 }
 \value{
 Results of the evaluation, invisibly. Mostly called for its side-effects:
@@ -32,8 +32,8 @@ via \code{\link[=results_read]{results_read()}} and friends.
 \code{evaluate()} and \code{evaluate_active_file()} are roughly analogous to
 \code{\link[devtools:test]{devtools::test()}} and \code{\link[devtools:test]{devtools::test_active_file()}}, respectively.
 Interface with them in the same way that you would with their devtools
-friends, though note the \code{epochs} argument—assuming that the models you're
+friends, though note the \code{repeats} argument—assuming that the models you're
 evaluating provide non-deterministic output, running the same test files
-multiple times by setting \code{epochs > 1} will help you quantify the
+multiple times by setting \code{repeats > 1} will help you quantify the
 variability of your evaluations.
 }
