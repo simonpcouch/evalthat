@@ -19,5 +19,7 @@ results_read <- function(dir = NULL) {
     res <- vctrs::vec_rbind(res, qs::qread(file))
   }
 
-  structure(dplyr::arrange(res, desc(timestamp)), class = c("evals_df", class(res)))
+  dplyr::arrange(res, desc(timestamp)) %>%
+    tidyr::unnest_wider(col = evaluating) %>%
+    structure(class = c("evals_df", class(res)))
 }

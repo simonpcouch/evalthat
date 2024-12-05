@@ -245,7 +245,7 @@ EvalProgressReporter <- R6::R6Class(
     #' @param timestamp DTTM as `format(Sys.time(), "%Y%m%d_%H%M%S")`.
     result_summary = function(timestamp) {
       tibble::tibble(
-        evaluating = self$ctxt_name,
+        evaluating = list(self$ctxt_name),
         pct = self$n_ok * 100 / max(self$n_fail + self$n_ok, 1),
         n_fail = self$n_fail,
         n_pass = self$n_ok,
