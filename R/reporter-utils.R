@@ -144,3 +144,21 @@ first_upper <- function(x) {
   substr(x, 1, 1) <- toupper(substr(x, 1, 1))
   x
 }
+
+ansi_collapse_context <- function(ctxt, width) {
+  res <- unlist(ctxt[vapply(ctxt, is.character, logical(1))])
+
+  if (length(res) == 0) {return("")}
+  if (length(res) == 1) {return(paste0(" [", unname(res), "]"))}
+
+  res <- cli::ansi_collapse(
+    res,
+    sep = "/",
+    sep2 = "/",
+    last = "/",
+    width = width,
+    style = "head"
+  )
+
+  paste0(" [", res, "]")
+}

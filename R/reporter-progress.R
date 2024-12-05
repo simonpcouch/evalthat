@@ -170,13 +170,14 @@ EvalProgressReporter <- R6::R6Class(
         }
       }
 
+      context <- ansi_collapse_context(self$ctxt_name, self$width - 40)
       message <- paste0(
         status, " ",
         sprintf("%4d", self$n_ok), " ",
         sprintf("%4d", self$n_fail),
         # TODO: do some fun `ansi_collapse` on information in `evaluating()`
         # and keep track of the current pct here
-        " | ", file_name_to_context(self$file_name)
+        " | ", file_name_to_context(self$file_name), context
       )
 
       if (complete) {
