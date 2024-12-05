@@ -1,4 +1,3 @@
-
 #' Flag model inputs and outputs
 #'
 #' When evaluating model input in evaluations, flag the input with `input()`

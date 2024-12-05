@@ -2,7 +2,7 @@
 % Please edit documentation in R/results.R
 \name{results_read}
 \alias{results_read}
-\title{Read eval results}
+\title{Interface with eval results}
 \usage{
 results_read(dir = NULL)
 }
@@ -13,8 +13,9 @@ row-bind the results.}
 }
 \value{
 A tibble containing the combined results from result files in the
-specified directory.
+specified directory. Evaluations are ordered chronologically, with most
+recent results on top.
 }
 \description{
-Read eval results
+Interface with eval results
 }

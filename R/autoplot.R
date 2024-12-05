@@ -2,6 +2,8 @@
 #' @export
 ggplot2::autoplot
 
+#' Plot evaluation results
+#'
 #' @export
 autoplot.evals_df <- function(object, ..., type = c("within", "across")) {
   type <- rlang::arg_match(type)

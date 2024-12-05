@@ -1,49 +1,47 @@
-# analogous to devtools::test
+#' Evaluate LLM performance
+#'
+#' @description
+#' `evaluate()` and `evaluate_active_file()` are roughly analogous to
+#' [devtools::test()] and [devtools::test_active_file()], respectively.
+#' Interface with them in the same way that you would with their devtools
+#' friends, though note the `epochs` argument—assuming that the models you're
+#' evaluating provide non-deterministic output, running the same test files
+#' multiple times by setting `epochs > 1` will help you quantify the
+#' variability of your evaluations.
+#'
+#' @param epochs A single positive integer specifying the number of
+#' evaluation epochs, or repeats over the same test files.
+#' @param pkg,file Path to the package or file in question. Optional.
+#  TODO: actually implement this
+#' @param filter A string or pattern to filter test files. Optional.
+#' @param ... Additional arguments passed to `testthat:::test_files()`.
+#'
+#' @returns
+#' Results of the evaluation, invisibly. Mostly called for its side-effects:
+#'
+#' * An interactive progress interface tracking results in real-time.
+#' * _Result files_ are stored in `evalthat/_results`. Result files contain
+#' persistent, fine-grained evaluation results and can be interfaced with
+#' via [results_read()] and friends.
+#'
+#' @export
 evaluate <- function(pkg = ".",
                      epochs = 1L,
                      filter = NULL,
-                     stop_on_failure = FALSE,
-                     export_all = TRUE,
                      ...) {
   # devtools:::save_all()
   pkg <- devtools::as.package(pkg)
   check_number_whole(epochs, min = 1, allow_infinite = FALSE)
-  # TODO: implement uses_evaltest
-  # if (!uses_testthat(pkg)) {
-  #   cli::cli_inform(c(i = "No testing infrastructure found."))
-  #   if (!interactive()) {
-  #     ui_todo("Setup testing with {ui_code(\"usethis::use_testthat()\")}.")
-  #     return(invisible())
-  #   }
-  #   if (yesno("Create it?")) {
-  #     return(invisible())
-  #   }
-  #   usethis_use_testthat(pkg)
-  #   return(invisible())
-  # }
+
+    # TODO: implement uses_evaltest and use_evalthat
+
   cli::cli_inform(c(i = "Evaluating {.pkg {pkg$package}}"))
   withr::local_envvar(devtools::r_env_vars())
   load_package <- load_package_for_testing(pkg)
-  # TODO: could switch to this if we want the tests to actually live in `tests/`
-  # but be prefixed with `eval-`
-  # testthat::local_mocked_bindings(
-  #   find_test_scripts = function(path,
-  #                                filter = NULL,
-  #                                invert = FALSE,
-  #                                ...,
-  #                                full.names = TRUE,
-  #                                start_first = NULL) {
-  #     files <- dir(path, "^eval.*\\.[rR]$", full.names = full.names)
-  #     files <- testthat:::filter_test_scripts(files, filter, invert, ...)
-  #     testthat:::order_test_scripts(files, start_first)
-  #   },
-  #   .package = "testthat"
-  # )
 
   eval_local(
     pkg$path,
     filter = filter,
-    stop_on_failure = stop_on_failure,
     load_package = load_package,
     reporter = EvalProgressReporter$new(),
     epochs = epochs,
@@ -51,32 +49,8 @@ evaluate <- function(pkg = ".",
   )
 }
 
-# copied from testthat
-load_package_for_testing <- function(pkg) {
-  if (pkg$package == "testthat") {
-    load_all(pkg$path, quiet = TRUE, helpers = FALSE)
-    "none"
-  }
-  else {
-    "source"
-  }
-}
-
-# # analogous to testthat::test_local
-eval_local <- function(path = ".", reporter = NULL, ..., load_package = "source", epochs = 1L) {
-  package <- pkgload::pkg_name(path)
-  test_path <- file.path(pkgload::pkg_path(path), "tests", "evalthat")
-  withr::local_envvar(NOT_CRAN = "true")
-
-  testthat:::test_files(
-    test_dir = test_path,
-    test_package = NULL,
-    test_paths = rep(testthat::find_test_scripts(test_path), each = epochs),
-    reporter = EvalProgressReporter$new()
-  )
-}
-
-# active file ---------
+#' @rdname evaluate
+#' @export
 evaluate_active_file <- function(file = active_eval_file(), epochs = 1L, ...) {
   check_number_whole(epochs, min = 1, allow_infinite = FALSE)
   pkg <- devtools::as.package(dirname(file))
@@ -104,6 +78,32 @@ evaluate_active_file <- function(file = active_eval_file(), epochs = 1L, ...) {
       reporter = EvalProgressReporter$new()
     )
   }
+}
+
+# copied from testthat
+load_package_for_testing <- function(pkg) {
+  if (pkg$package == "testthat") {
+    load_all(pkg$path, quiet = TRUE, helpers = FALSE)
+    "none"
+  }
+  else {
+    "source"
+  }
+}
+
+# # analogous to testthat::test_local
+eval_local <- function(path = ".", reporter = NULL, ..., load_package = "source", epochs = 1L) {
+  package <- pkgload::pkg_name(path)
+  test_path <- file.path(pkgload::pkg_path(path), "tests", "evalthat")
+  withr::local_envvar(NOT_CRAN = "true")
+
+  testthat:::test_files(
+    test_dir = test_path,
+    test_package = NULL,
+    test_paths = rep(testthat::find_test_scripts(test_path), each = epochs),
+    reporter = EvalProgressReporter$new(),
+    ...
+  )
 }
 
 active_eval_file <- function(arg = "file", call = parent.frame()) {

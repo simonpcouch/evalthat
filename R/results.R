@@ -1,4 +1,4 @@
-#' Read eval results
+#' Interface with eval results
 #'
 #' @param dir Optional. A single string specifying a subdirectory of
 #' `tests/evalthat/_results`. If `NULL`, will read each subdirectory and
@@ -6,7 +6,8 @@
 #'
 #' @returns
 #' A tibble containing the combined results from result files in the
-#' specified directory.
+#' specified directory. Evaluations are ordered chronologically, with most
+#' recent results on top.
 #'
 #' @export
 results_read <- function(dir = NULL) {

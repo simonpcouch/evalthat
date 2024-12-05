@@ -2,7 +2,7 @@
 % Please edit documentation in R/evaluating.R
 \name{evaluating}
 \alias{evaluating}
-\title{Set context for evaluation task}
+\title{Set context for evaluation}
 \usage{
 evaluating(model, task, ...)
 }
@@ -11,9 +11,16 @@ evaluating(model, task, ...)
 
 \item{task}{A single string describing the task being evaluated on.}
 
-\item{...}{TODO: document}
+\item{...}{Additional named fields describing eval metadata, e.g. the prompt
+version, model provider, etc.}
 }
 \description{
-This helper is analogous to \code{testthat::context()} and sets metadata
-for the test for logging.
+This helper is analogous to \code{\link[testthat:context]{testthat::context()}} and sets metadata
+for the test for logging. Arguments passed to this function, including via
+\code{...}, will logged in the eval's \emph{result file}, readable with \code{results_read()}.
+}
+\details{
+TODO: this will be most helpful when \code{evaluate_across()} is available. at
+that point, explain how to iterate across models/prompts etc by programatically
+passing values to this function.
 }

@@ -1,9 +1,24 @@
+#' Check if input is syntactically valid R code
+#'
+#' @param object A single string, possibly containing parse-able R code.
+#'
+#' @details
+#' This helper does not attempt to evaluate the code in the provided string.
+#' Instead, it uses [treesitter::parser_parse()] to determine whether the string
+#' contains valid R syntax.
+#'
+#' This expectation will fail if `object` contains any exposition surrounding
+#' the code, including if code is surrounded by backticks.
+#'
+#' @returns
+#' Returns nothing but throws an error if the input is not valid R code.
+#'
+#' @export
 expect_r_code <- function(object) {
-  # object <- "cli::cli_abort(\"hey there\")"
-
   tree <- treesitter::parser_parse(r_parser, object)
   node <- treesitter::tree_root_node(tree)
 
+  # TODO: i think this (incorrectly?) fails for multiple lines of code
   expect(
     !treesitter::node_has_error(node),
     "Output was not syntactically valid R code."

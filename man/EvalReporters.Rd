@@ -4,8 +4,12 @@
 \alias{EvalReporters}
 \alias{EvalProgressReporter}
 \alias{EvalCompactProgressReporter}
-\title{Test reporter: interactive progress bar of errors.}
+\title{Test reporters for LLM evaluation}
 \description{
+evalthat provides a number of custom testthat \link[testthat:Reporter]{testthat::Reporter}s.
+These reporters process the results from test files, generating interactive
+summaries and saving results to persistent files.
+
 \code{EvalProgressReporter} is designed for interactive use. Its goal is to
 give you actionable insights to help you understand the status of your
 code. This reporter also praises you from time-to-time if all your tests

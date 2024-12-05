@@ -1,6 +1,10 @@
-#' Test reporter: interactive progress bar of errors.
+#' Test reporters for LLM evaluation
 #'
 #' @description
+#' evalthat provides a number of custom testthat [testthat::Reporter]s.
+#' These reporters process the results from test files, generating interactive
+#' summaries and saving results to persistent files.
+#'
 #' `EvalProgressReporter` is designed for interactive use. Its goal is to
 #' give you actionable insights to help you understand the status of your
 #' code. This reporter also praises you from time-to-time if all your tests
