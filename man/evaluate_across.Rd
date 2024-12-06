@@ -14,9 +14,12 @@ when evaluating the file at \code{path} and each row represents a pass through
 that file.}
 
 \item{repeats}{A single positive integer specifying the number of
-evaluation repeats, or runs over the same test files.}
+evaluation repeats, or runs over the same test files. Assuming that the
+models you're evaluating provide non-deterministic output, running the
+same test files multiple times by setting \code{repeats > 1} will help you
+quantify the variability of your evaluations.}
 
-\item{...}{Additional arguments passed to \code{testthat:::test_files()}.}
+\item{...}{Additional arguments passed to internal functions.}
 }
 \description{
 \code{evaluate_across()} is an extension of \code{\link[=evaluate]{evaluate()}} and friends that
@@ -25,25 +28,24 @@ or any other arbitrary parameter.
 }
 \examples{
 \dontshow{if (FALSE) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-# evaluate a directory of evals across several models
+# evaluate a directory of evals across several models,
+# repeating each eval twice
 evaluate_across(
-  tibble::tribble(
-    ~provider,          ~model,
-    elmer::chat_openai, "gpt-4o",
-    elmer::chat_openai, "gpt-4o-mini",
-    elmer::chat_claude, "claude-3-5-sonnet-latest",
-    elmer::chat_ollama, "qwen2.5-coder:14b"
-  )
+  tibble(chat = c(
+    chat_openai(model = "gpt-4o-mini", echo = FALSE),
+    chat_claude(model = "claude-3-5-sonnet-latest", echo = FALSE))
+  ),
+  repeats = 2
 )
 
 # in the eval file, write...
-```r
-provider <- getOption("provider", default = elmer::chat_claude)
-model <- getOption("model", default = "claude-3-5-sonnet-latest")
+chat <- getOption(
+  "chat",
+  default = list(elmer::chat_claude("claude-3-5-sonnet-latest", echo = FALSE))
+)[[1]]
 
-chat <- provider(model = model)
+evaluating(model = str(chat))
 
 # ... and so on
-```
 \dontshow{\}) # examplesIf}
 }

@@ -1,118 +1,68 @@
 #' Evaluate LLM performance
 #'
 #' @description
-#' `evaluate()`, `evaluate_file()`, `evaluate_active_file()` are roughly
-#' analogous to [devtools::test()], [devtools::test_file()], and
-#' [devtools::test_active_file()], respectively.
-#' Interface with them in the same way that you would with their devtools
-#' friends, though note the `repeats` argument—assuming that the models you're
-#' evaluating provide non-deterministic output, running the same test files
-#' multiple times by setting `repeats > 1` will help you quantify the
-#' variability of your evaluations.
+#' `evaluate()` and `evaluate_active_file()` are roughly analogous to
+#' [devtools::test()] and [devtools::test_active_file()], though note that
+#' `evaluate()` can take either a directory of files or a single file.
 #'
 #' @param repeats A single positive integer specifying the number of
-#' evaluation repeats, or runs over the same test files.
+#' evaluation repeats, or runs over the same test files. Assuming that the
+#' models you're evaluating provide non-deterministic output, running the
+#' same test files multiple times by setting `repeats > 1` will help you
+#' quantify the variability of your evaluations.
 #' @param path Path to the directory or file in question. Optional.
-#  TODO: actually implement this
-#' @param filter A string or pattern to filter test files. Optional.
-#' @param ... Additional arguments passed to `testthat:::test_files()`.
+#' @param ... Additional arguments passed to internal functions.
 #'
 #' @returns
 #' Results of the evaluation, invisibly. Mostly called for its side-effects:
 #'
 #' * An interactive progress interface tracking results in real-time.
-#' * _Result files_ are stored in `evalthat/_results`. Result files contain
+#' * _Result files_ are stored in `dirname(path)/_results`. Result files contain
 #' persistent, fine-grained evaluation results and can be interfaced with
 #' via [results_read()] and friends.
 #'
 #' @export
-evaluate <- function(path = ".",
-                     repeats = 1L,
-                     ...) {
-  # devtools:::save_all()
-  path <- devtools::as.package(path)
-  check_number_whole(repeats, min = 1, allow_infinite = FALSE)
-
-    # TODO: implement uses_evaltest and use_evalthat
-
-  cli::cli_inform(c(i = "Evaluating {.pkg {path$package}}"))
-  withr::local_envvar(devtools::r_env_vars())
-  load_package <- load_package_for_testing(path)
-
-  eval_local(
-    path$path,
-    load_package = load_package,
-    reporter = EvalProgressReporter$new(),
-    repeats = repeats,
-    ...
-  )
+evaluate <- function(path = ".", repeats = 1L, ...) {
+  evaluate_impl(path = path, repeats = repeats, ...)
 }
 
 #' @rdname evaluate
 #' @export
 evaluate_active_file <- function(path = active_eval_file(), repeats = 1L, ...) {
-  evaluate_file_impl(path = path, repeats = repeats, ...)
+  evaluate_impl(path = path, repeats = repeats, ...)
 }
 
-#' @rdname evaluate
-evaluate_file <- function(path, repeats = 1L, ...) {
-  evaluate_file_impl(path = path, repeats = repeats, ...)
-}
-
-evaluate_file_impl <- function(path,
-                               repeats,
-                               ...,
-                               reporter = NULL,
-                               call = caller_env()) {
+evaluate_impl <- function(path,
+                          repeats,
+                          ...,
+                          reporter = NULL,
+                          call = caller_env()) {
   check_number_whole(repeats, min = 1, allow_infinite = FALSE, call = call)
-  pkg <- devtools::as.package(dirname(path))
+
+  eval_files <- eval_files(path)
+
   withr::local_envvar(devtools::r_env_vars())
-  load_package <- load_package_for_testing(pkg)
-  if (identical(repeats, 1L) && is.null(reporter)) {
+
+  if (identical(repeats, 1L) &&
+      is.null(reporter) &&
+      length(eval_files$eval_files) == 1) {
     testthat::test_file(
       path,
-      package = pkg$package,
-      load_package = load_package,
       reporter = EvalCompactProgressReporter$new(),
       ...
     )
   } else {
-    # todo: does this actually need to be a different reporter? or could
-    # `testthat:::test_files()` be exported?
     test_files_serial(
-      test_dir = "tests/evalthat",
-      test_package = pkg$package,
-      load_package = load_package,
-      test_paths = rep(path, times = repeats),
+      test_dir = eval_files$eval_dir,
+      test_package = NULL,
+      load_package = "none",
+      test_paths = rep(
+        file.path(eval_files$eval_dir, eval_files$eval_files),
+        times = repeats
+      ),
       reporter = reporter %||% EvalProgressReporter$new()
     )
   }
-}
-
-# copied from testthat
-load_package_for_testing <- function(pkg) {
-  if (pkg$package == "testthat") {
-    load_all(pkg$path, quiet = TRUE, helpers = FALSE)
-    "none"
-  }
-  else {
-    "source"
-  }
-}
-
-# # analogous to testthat::test_local
-eval_local <- function(path = ".", reporter = NULL, ..., load_package = "source", repeats = 1L) {
-  package <- pkgload::pkg_name(path)
-  test_path <- file.path(pkgload::pkg_path(path), "tests", "evalthat")
-  withr::local_envvar(NOT_CRAN = "true")
-
-  testthat:::test_files(
-    test_dir = test_path,
-    test_package = NULL,
-    test_paths = rep(testthat::find_test_scripts(test_path), each = repeats),
-    reporter = reporter || EvalProgressReporter$new(),
-    ...
-  )
 }
 
 active_eval_file <- function(arg = "file", call = parent.frame()) {
@@ -126,8 +76,7 @@ active_eval_file <- function(arg = "file", call = parent.frame()) {
 
   if (!is_eval_file(test_file)) {
     cli::cli_abort(
-      "The active file must begin with {.field test-} and live in
-       the  {.file tests/evalthat/} directory.",
+      "The active file must an R file named beginning with {.field test-}.",
       call = call
     )
   }
@@ -136,12 +85,60 @@ active_eval_file <- function(arg = "file", call = parent.frame()) {
 }
 
 is_eval_file <- function(path) {
-  dir_name <- dirname(path)
-
-  identical(basename(dir_name), "evalthat") &&
-  grepl("^test-", basename(path))
+  grepl("^test-", basename(path)) & grepl("\\.[Rr]$", basename(path))
 }
 
 is_rstudio_running <- function() {
   !is_testing() && rstudioapi::isAvailable()
+}
+
+eval_files <- function(path, call = caller_env()) {
+  if (!dir.exists(path) && !file.exists(path)) {
+    cli::cli_abort("{.arg path} does not exist.")
+  }
+
+  if (!dir.exists(path)) {
+    return(list(eval_dir = dirname(path), eval_files = basename(path)))
+  }
+
+  eval_files <- list.files(path)
+  list(eval_dir = path, eval_files = eval_files[is_eval_file(eval_files)])
+}
+
+# copied from testthat so that we can set `start_end_reporter = FALSE` in `with_reporter()`
+test_files_serial <- function(test_dir,
+                              test_package,
+                              test_paths,
+                              load_package,
+                              reporter,
+                              env = NULL,
+                              desc = NULL,
+                              stop_on_failure = FALSE,
+                              stop_on_warning = FALSE,
+                              error_call = caller_env()) {
+  env <- testthat:::test_files_setup_env(
+    test_package,
+    test_dir,
+    load_package,
+    env
+  )
+  testthat:::local_testing_env(env)
+
+  reporters <- testthat:::test_files_reporter(reporter)
+  testthat:::with_reporter(
+    reporters$multi,
+    lapply(
+      test_paths,
+      testthat:::test_one_file,
+      env = env,
+      desc = desc,
+      error_call = error_call
+    ),
+    start_end_reporter = FALSE
+  )
+  testthat:::test_files_check(
+    reporters$list$get_results(),
+    stop_on_failure = stop_on_failure,
+    stop_on_warning = stop_on_warning
+  )
 }

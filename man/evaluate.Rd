@@ -3,41 +3,34 @@
 \name{evaluate}
 \alias{evaluate}
 \alias{evaluate_active_file}
-\alias{evaluate_file}
 \title{Evaluate LLM performance}
 \usage{
 evaluate(path = ".", repeats = 1L, ...)
 
 evaluate_active_file(path = active_eval_file(), repeats = 1L, ...)
-
-evaluate_file(path, repeats = 1L, ...)
 }
 \arguments{
 \item{path}{Path to the directory or file in question. Optional.}
 
 \item{repeats}{A single positive integer specifying the number of
-evaluation repeats, or runs over the same test files.}
+evaluation repeats, or runs over the same test files. Assuming that the
+models you're evaluating provide non-deterministic output, running the
+same test files multiple times by setting \code{repeats > 1} will help you
+quantify the variability of your evaluations.}
 
-\item{...}{Additional arguments passed to \code{testthat:::test_files()}.}
-
-\item{filter}{A string or pattern to filter test files. Optional.}
+\item{...}{Additional arguments passed to internal functions.}
 }
 \value{
 Results of the evaluation, invisibly. Mostly called for its side-effects:
 \itemize{
 \item An interactive progress interface tracking results in real-time.
-\item \emph{Result files} are stored in \verb{evalthat/_results}. Result files contain
+\item \emph{Result files} are stored in \verb{dirname(path)/_results}. Result files contain
 persistent, fine-grained evaluation results and can be interfaced with
 via \code{\link[=results_read]{results_read()}} and friends.
 }
 }
 \description{
-\code{evaluate()}, \code{evaluate_file()}, \code{evaluate_active_file()} are roughly
-analogous to \code{\link[devtools:test]{devtools::test()}}, \code{\link[devtools:devtools-deprecated]{devtools::test_file()}}, and
-\code{\link[devtools:test]{devtools::test_active_file()}}, respectively.
-Interface with them in the same way that you would with their devtools
-friends, though note the \code{repeats} argument—assuming that the models you're
-evaluating provide non-deterministic output, running the same test files
-multiple times by setting \code{repeats > 1} will help you quantify the
-variability of your evaluations.
+\code{evaluate()} and \code{evaluate_active_file()} are roughly analogous to
+\code{\link[devtools:test]{devtools::test()}} and \code{\link[devtools:test]{devtools::test_active_file()}}, though note that
+\code{evaluate()} can take either a directory of files or a single file.
 }
