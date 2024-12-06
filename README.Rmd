@@ -73,37 +73,39 @@ testthat users will notice a couple changes:
 * The functions `input()` and `output()` flag "what went into the model?" and "what came out?"
 * In addition to the regular `expect_*()` functions from testthat, the package supplies a number of new expectation functions that are helpful in evaluating R code contained in a character string (as it will be when outputted from elmer or its extensions). Those that begin with `expect_*()` are automated, those that begin with `grade_*()` are less-so.
 
-Running the above test file results in a persistent _result file_—think of it like a snapshot. evalthat supplies a number of helpers for working with result files, allowing you to compare performance across various models, iterate on prompts, quantify variability in output, and so on:
+Running the above test file results in a persistent _result file_—think of it like a snapshot. evalthat supplies a number of helpers for working with result files, allowing you to compare performance across various models, iterate on prompts, quantify variability in output, and so on. On the full ggplot2 example file, we could run 5 passes evaluating several different models for revising ggplot2 code:
+
+```{r, eval = FALSE}
+library(elmer)
+
+temp <- list(temperature = 1)
+
+evaluate_across(
+  "tests/evalthat/test-ggplot2.R",
+  tibble(chat = c(
+    chat_openai(model = "gpt-4o", api_args = temp, echo = FALSE),
+    chat_openai(model = "gpt-4o-mini", api_args = temp, echo = FALSE),
+    chat_claude(model = "claude-3-5-sonnet-latest", echo = FALSE))
+  ),
+  repeats = 5
+)
+```
+
+![](inst/ex_eval.gif)
+
+Then, `results_read()` will return a data frame with information on the evaluation results:
 
 ```{r, eval = FALSE, include = FALSE}
-# quick scratch to generate some example. 
-# TODO: transition to `evaluate_across()`.
-options(
-  chat_fn = elmer::chat_claude,
-  model = "claude-3-5-sonnet-latest"
-)
+# read in and save the results for the package:
+ex_ggplot2 <- results_read()
+qs::qsave(ex_ggplot2, "inst/ex_ggplot2.rds")
+```
 
-evaluate_file("test-ggplot2.R", repeats = 10)
-
-options(
-  chat_fn = elmer::chat_openai,
-  model = "gpt-4o-mini"
-)
-
-evaluate_file("test-ggplot2.R", repeats = 10)
-
-options(
-  chat_fn = elmer::chat_openai,
-  model = "gpt-4o"
-)
-
-evaluate_file("test-ggplot2.R", repeats = 10)
-
+```{r, eval = FALSE, include = FALSE}
+ex_ggplot2 <- qs::qread("inst/ex_ggplot2.rds")
 library(tidyverse)
 
-res <- results_read()
-
-plot <- res %>% 
+plot <- ex_ggplot2 %>% 
   ggplot() +
   aes(x = pct, fill = model) +
   geom_histogram(position = "identity", alpha = .5) +
@@ -119,11 +121,11 @@ plot <- res %>%
        is such that the same input always returns the same response."
   ) +
   scale_fill_viridis_d(end = .7) +
-  theme(legend.position.inside = c(0.15, 0.75))
+  theme(legend.position = c(0.3, 0.75))
 
 plot
 
-ggsave("inst/ex_plot.png", plot, scale = .7)
+ggsave("inst/ex_plot.png", width = 5.5, height = 4, plot)
 ```
 
 ```{r, echo = FALSE, fig.alt="A ggplot2 histogram, showing distributions of performance on the task 'translating R erroring code to cli' for three different models: Claude 3.5 Sonner, GPT-4o, and GPT-4o-mini. Claude Sonnet 3.5 and GPT-4o with default elmer settings offer comparable performance on average, though GPT-4o's 'temperature' is such that the same input always returns the same response."}

@@ -78,6 +78,29 @@ testthat users will notice a couple changes:
 Running the above test file results in a persistent *result file*—think
 of it like a snapshot. evalthat supplies a number of helpers for working
 with result files, allowing you to compare performance across various
-models, iterate on prompts, quantify variability in output, and so on:
+models, iterate on prompts, quantify variability in output, and so on.
+On the full ggplot2 example file, we could run 5 passes evaluating
+several different models for revising ggplot2 code:
+
+``` r
+library(elmer)
+
+temp <- list(temperature = 1)
+
+evaluate_across(
+  "tests/evalthat/test-ggplot2.R",
+  tibble(chat = c(
+    chat_openai(model = "gpt-4o", api_args = temp, echo = FALSE),
+    chat_openai(model = "gpt-4o-mini", api_args = temp, echo = FALSE),
+    chat_claude(model = "claude-3-5-sonnet-latest", echo = FALSE))
+  ),
+  repeats = 5
+)
+```
+
+![](inst/ex_eval.gif)
+
+Then, `results_read()` will return a data frame with information on the
+evaluation results:
 
 <img src="inst/ex_plot.png" alt="A ggplot2 histogram, showing distributions of performance on the task 'translating R erroring code to cli' for three different models: Claude 3.5 Sonner, GPT-4o, and GPT-4o-mini. Claude Sonnet 3.5 and GPT-4o with default elmer settings offer comparable performance on average, though GPT-4o's 'temperature' is such that the same input always returns the same response." width="100%" />

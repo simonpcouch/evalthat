@@ -12,7 +12,7 @@ chat$set_system_prompt(
 test_that("model can write ggplot2 code for a basic histogram", {
   input <- input("Could you please write ggplot2 code to make a histogram of
                   the mpg variable from mtcars?")
-  output <- output(chat$chat(input))
+  output <- output(chat$clone()$chat(input))
 
   # syntactically valid
   expect_r_code(output)
@@ -26,7 +26,7 @@ test_that("model can write ggplot2 code for a basic histogram", {
 
 test_that("model can convert code from base R `plot()`", {
   input <- input("Convert this code to use ggplot2: `boxplot(len ~ supp, data = ToothGrowth)`")
-  output <- output(chat$chat(input))
+  output <- output(chat$clone()$chat(input))
 
   # syntactically valid
   expect_r_code(output)
@@ -50,7 +50,7 @@ test_that("model can convert from stacked to dodged bars", {
      `ggplot(mtcars) + aes(x = cyl, fill = factor(vs)) + geom_bar()`
     "
   )
-  output <- output(chat$chat(input))
+  output <- output(chat$clone()$chat(input))
 
   # syntactically valid
   expect_r_code(output)
@@ -70,7 +70,7 @@ test_that("model can decrease bar width", {
      `ggplot(mtcars) + aes(x = cyl, fill = factor(vs)) + geom_bar()`
     "
   )
-  output <- output(chat$chat(input))
+  output <- output(chat$clone()$chat(input))
 
   # syntactically valid
   expect_r_code(output)
@@ -89,7 +89,7 @@ test_that("model can add means to a boxplot", {
      `ggplot(mtcars, aes(x = factor(cyl), y = mpg)) + geom_boxplot()`
     "
   )
-  output <- output(chat$chat(input))
+  output <- output(chat$clone()$chat(input))
 
   # syntactically valid
   expect_r_code(output)
@@ -110,7 +110,7 @@ test_that("model can move a legend", {
      `ggplot(mtcars) + aes(x = cyl, fill = factor(vs)) + geom_bar()`
     "
   )
-  output <- output(chat$chat(input))
+  output <- output(chat$clone()$chat(input))
 
   # syntactically valid
   expect_r_code(output)
@@ -133,7 +133,7 @@ test_that("model can use subscript in axis label", {
      `ggplot(CO2) + aes(x = uptake) + geom_histogram() + labs(x = 'CO_2 Uptake')`
     "
   )
-  output <- output(chat$chat(input))
+  output <- output(chat$clone()$chat(input))
 
   # syntactically valid
   expect_r_code(output)
