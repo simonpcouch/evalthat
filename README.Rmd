@@ -119,7 +119,7 @@ plot <- res %>%
        is such that the same input always returns the same response."
   ) +
   scale_fill_viridis_d(end = .7) +
-  theme(legend.position = c(0.15, 0.75))
+  theme(legend.position.inside = c(0.15, 0.75))
 
 plot
 
