@@ -12,7 +12,7 @@
 #'
 #' @param repeats A single positive integer specifying the number of
 #' evaluation repeats, or runs over the same test files.
-#' @param pkg,file Path to the package or file in question. Optional.
+#' @param path Path to the directory or file in question. Optional.
 #  TODO: actually implement this
 #' @param filter A string or pattern to filter test files. Optional.
 #' @param ... Additional arguments passed to `testthat:::test_files()`.
@@ -26,21 +26,21 @@
 #' via [results_read()] and friends.
 #'
 #' @export
-evaluate <- function(pkg = ".",
+evaluate <- function(path = ".",
                      repeats = 1L,
                      ...) {
   # devtools:::save_all()
-  pkg <- devtools::as.package(pkg)
+  path <- devtools::as.package(path)
   check_number_whole(repeats, min = 1, allow_infinite = FALSE)
 
     # TODO: implement uses_evaltest and use_evalthat
 
-  cli::cli_inform(c(i = "Evaluating {.pkg {pkg$package}}"))
+  cli::cli_inform(c(i = "Evaluating {.pkg {path$package}}"))
   withr::local_envvar(devtools::r_env_vars())
-  load_package <- load_package_for_testing(pkg)
+  load_package <- load_package_for_testing(path)
 
   eval_local(
-    pkg$path,
+    path$path,
     load_package = load_package,
     reporter = EvalProgressReporter$new(),
     repeats = repeats,
@@ -50,23 +50,23 @@ evaluate <- function(pkg = ".",
 
 #' @rdname evaluate
 #' @export
-evaluate_active_file <- function(file = active_eval_file(), repeats = 1L, ...) {
-  evaluate_file_impl(file = file, repeats = repeats, ...)
+evaluate_active_file <- function(path = active_eval_file(), repeats = 1L, ...) {
+  evaluate_file_impl(path = path, repeats = repeats, ...)
 }
 
 #' @rdname evaluate
-evaluate_file <- function(file, repeats = 1L, ...) {
-  evaluate_file_impl(file = file, repeats = repeats, ...)
+evaluate_file <- function(path, repeats = 1L, ...) {
+  evaluate_file_impl(path = path, repeats = repeats, ...)
 }
 
-evaluate_file_impl <- function(file, repeats, ..., call = caller_env()) {
+evaluate_file_impl <- function(path, repeats, ..., call = caller_env()) {
   check_number_whole(repeats, min = 1, allow_infinite = FALSE, call = call)
-  pkg <- devtools::as.package(dirname(file))
+  pkg <- devtools::as.package(dirname(path))
   withr::local_envvar(devtools::r_env_vars())
   load_package <- load_package_for_testing(pkg)
   if (identical(repeats, 1L)) {
     testthat::test_file(
-      file,
+      path,
       package = pkg$package,
       load_package = load_package,
       reporter = EvalCompactProgressReporter$new(),
