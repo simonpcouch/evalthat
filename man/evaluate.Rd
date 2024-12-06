@@ -6,14 +6,14 @@
 \alias{evaluate_file}
 \title{Evaluate LLM performance}
 \usage{
-evaluate(pkg = ".", repeats = 1L, ...)
+evaluate(path = ".", repeats = 1L, ...)
 
-evaluate_active_file(file = active_eval_file(), repeats = 1L, ...)
+evaluate_active_file(path = active_eval_file(), repeats = 1L, ...)
 
-evaluate_file(file, repeats = 1L, ...)
+evaluate_file(path, repeats = 1L, ...)
 }
 \arguments{
-\item{pkg, file}{Path to the package or file in question. Optional.}
+\item{path}{Path to the directory or file in question. Optional.}
 
 \item{repeats}{A single positive integer specifying the number of
 evaluation repeats, or runs over the same test files.}
