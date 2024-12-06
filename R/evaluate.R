@@ -136,9 +136,4 @@ test_files_serial <- function(test_dir,
     ),
     start_end_reporter = FALSE
   )
-  testthat:::test_files_check(
-    reporters$list$get_results(),
-    stop_on_failure = stop_on_failure,
-    stop_on_warning = stop_on_warning
-  )
 }
