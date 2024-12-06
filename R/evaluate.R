@@ -59,12 +59,16 @@ evaluate_file <- function(path, repeats = 1L, ...) {
   evaluate_file_impl(path = path, repeats = repeats, ...)
 }
 
-evaluate_file_impl <- function(path, repeats, ..., call = caller_env()) {
+evaluate_file_impl <- function(path,
+                               repeats,
+                               ...,
+                               reporter = NULL,
+                               call = caller_env()) {
   check_number_whole(repeats, min = 1, allow_infinite = FALSE, call = call)
   pkg <- devtools::as.package(dirname(path))
   withr::local_envvar(devtools::r_env_vars())
   load_package <- load_package_for_testing(pkg)
-  if (identical(repeats, 1L)) {
+  if (identical(repeats, 1L) && is.null(reporter)) {
     testthat::test_file(
       path,
       package = pkg$package,
@@ -75,12 +79,12 @@ evaluate_file_impl <- function(path, repeats, ..., call = caller_env()) {
   } else {
     # todo: does this actually need to be a different reporter? or could
     # `testthat:::test_files()` be exported?
-    testthat:::test_files(
+    test_files_serial(
       test_dir = "tests/evalthat",
       test_package = pkg$package,
       load_package = load_package,
-      test_paths = rep(file, times = repeats),
-      reporter = EvalProgressReporter$new()
+      test_paths = rep(path, times = repeats),
+      reporter = reporter %||% EvalProgressReporter$new()
     )
   }
 }
@@ -106,7 +110,7 @@ eval_local <- function(path = ".", reporter = NULL, ..., load_package = "source"
     test_dir = test_path,
     test_package = NULL,
     test_paths = rep(testthat::find_test_scripts(test_path), each = repeats),
-    reporter = EvalProgressReporter$new(),
+    reporter = reporter || EvalProgressReporter$new(),
     ...
   )
 }
