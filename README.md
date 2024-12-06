@@ -105,4 +105,4 @@ Then, `results_read()` will return a data frame with information on the
 evaluation results for further analysis. Visualizing this example
 output:
 
-<img src="inst/ex_plot.png" alt="A ggplot2 histogram, showing distributions of performance on the task 'translating R erroring code to cli' for three different models: Claude 3.5 Sonner, GPT-4o, and GPT-4o-mini. Claude Sonnet 3.5 and GPT-4o with default elmer settings offer comparable performance on average, though GPT-4o's 'temperature' is such that the same input always returns the same response." width="100%" />
+<img src="inst/ex_plot.png" alt="A ggplot2 histogram, showing distributions of performance on the task 'translating R erroring code to cli' for three different models: Claude 3.5 Sonner, GPT-4o, and GPT-4o-mini. They all pass with flying colors, probably indicating the need for a harder eval." width="100%" />
