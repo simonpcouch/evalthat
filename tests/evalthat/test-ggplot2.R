@@ -1,21 +1,21 @@
 skip_if_offline()
 
-if (is.null(getOption("chat_fn"))) {
+if (is.null(getOption("provider"))) {
   skip_if(identical(Sys.getenv("ANTHROPIC_API_KEY"), ""))
-  chat_fn <- elmer::chat_claude
-  model <- "claude-3-5-sonnet-latest"
-} else {
-  chat_fn <- getOption("chat_fn")
-  model <- getOption("model")
 }
 
+provider <- getOption("provider", default = list(elmer::chat_claude))[[1]]
+model <- getOption("model", default = "claude-3-5-sonnet-latest")
+temperature <- getOption("temperature", default = .7)
+
 evaluating(
-  chat_fn = "TODO-idk",
-  model = getOption("model")
+  provider = "TODO",
+  model = model,
+  api_args = list(temperature = temperature)
 )
 
 test_that("model can write ggplot2 code for a basic histogram", {
-  chat <- chat_fn(
+  chat <- provider(
     model = model,
     system_prompt = "When asked a question about R code, reply with only the
                      code needed to answer the question. No exposition, no
@@ -37,7 +37,7 @@ test_that("model can write ggplot2 code for a basic histogram", {
 })
 
 test_that("model can convert code from base R `plot()`", {
-  chat <- chat_fn(
+  chat <- provider(
     model = model,
     system_prompt = "When asked a question about R code, reply with only the
                      code needed to answer the question. No exposition, no
@@ -64,7 +64,7 @@ test_that("model can convert code from base R `plot()`", {
 })
 
 test_that("model can convert from stacked to dodged bars", {
-  chat <- chat_fn(
+  chat <- provider(
     model = model,
     system_prompt = "When asked a question about R code, reply with only the
                      code needed to answer the question. No exposition, no
@@ -91,7 +91,7 @@ test_that("model can convert from stacked to dodged bars", {
 })
 
 test_that("model can decrease bar width", {
-  chat <- chat_fn(
+  chat <- provider(
     model = model,
     system_prompt = "When asked a question about R code, reply with only the
                      code needed to answer the question. No exposition, no
@@ -117,7 +117,7 @@ test_that("model can decrease bar width", {
 })
 
 test_that("model can add means to a boxplot", {
-  chat <- chat_fn(
+  chat <- provider(
     model = model,
     system_prompt = "When asked a question about R code, reply with only the
                      code needed to answer the question. No exposition, no
@@ -145,7 +145,7 @@ test_that("model can add means to a boxplot", {
 })
 
 test_that("model can move a legend", {
-  chat <- chat_fn(
+  chat <- provider(
     model = model,
     system_prompt = "When asked a question about R code, reply with only the
                      code needed to answer the question. No exposition, no
@@ -175,7 +175,7 @@ test_that("model can move a legend", {
 })
 
 test_that("model can use subscript in axis label", {
-  chat <- chat_fn(
+  chat <- provider(
     model = model,
     system_prompt = "When asked a question about R code, reply with only the
                      code needed to answer the question. No exposition, no
