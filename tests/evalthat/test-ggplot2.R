@@ -1,27 +1,15 @@
 skip_if_offline()
 
-if (is.null(getOption("provider"))) {
-  skip_if(identical(Sys.getenv("ANTHROPIC_API_KEY"), ""))
-}
+chat <- getOption("chat", default = list(elmer::chat_claude("claude-3-5-sonnet-latest", echo = FALSE)))[[1]]
 
-provider <- getOption("provider", default = list(elmer::chat_claude))[[1]]
-model <- getOption("model", default = "claude-3-5-sonnet-latest")
-temperature <- getOption("temperature", default = .7)
+evaluating(model = str(chat))
 
-evaluating(
-  provider = "TODO",
-  model = model,
-  api_args = list(temperature = temperature)
+chat$set_system_prompt(
+  "When asked a question about R code, reply with only the code needed to answer
+  the question. No exposition, no backticks."
 )
 
 test_that("model can write ggplot2 code for a basic histogram", {
-  chat <- provider(
-    model = model,
-    system_prompt = "When asked a question about R code, reply with only the
-                     code needed to answer the question. No exposition, no
-                     backticks."
-  )
-
   input <- input("Could you please write ggplot2 code to make a histogram of
                   the mpg variable from mtcars?")
   output <- output(chat$chat(input))
@@ -37,13 +25,6 @@ test_that("model can write ggplot2 code for a basic histogram", {
 })
 
 test_that("model can convert code from base R `plot()`", {
-  chat <- provider(
-    model = model,
-    system_prompt = "When asked a question about R code, reply with only the
-                     code needed to answer the question. No exposition, no
-                     backticks."
-  )
-
   input <- input("Convert this code to use ggplot2: `boxplot(len ~ supp, data = ToothGrowth)`")
   output <- output(chat$chat(input))
 
@@ -64,13 +45,6 @@ test_that("model can convert code from base R `plot()`", {
 })
 
 test_that("model can convert from stacked to dodged bars", {
-  chat <- provider(
-    model = model,
-    system_prompt = "When asked a question about R code, reply with only the
-                     code needed to answer the question. No exposition, no
-                     backticks."
-  )
-
   input <- input(
     "Make the bars side-by-side rather than stacked on top of each other:
      `ggplot(mtcars) + aes(x = cyl, fill = factor(vs)) + geom_bar()`
@@ -91,13 +65,6 @@ test_that("model can convert from stacked to dodged bars", {
 })
 
 test_that("model can decrease bar width", {
-  chat <- provider(
-    model = model,
-    system_prompt = "When asked a question about R code, reply with only the
-                     code needed to answer the question. No exposition, no
-                     backticks."
-  )
-
   input <- input(
     "Make the bars skinnier:
      `ggplot(mtcars) + aes(x = cyl, fill = factor(vs)) + geom_bar()`
@@ -117,13 +84,6 @@ test_that("model can decrease bar width", {
 })
 
 test_that("model can add means to a boxplot", {
-  chat <- provider(
-    model = model,
-    system_prompt = "When asked a question about R code, reply with only the
-                     code needed to answer the question. No exposition, no
-                     backticks."
-  )
-
   input <- input(
     "Add a square in each box to show the mean:
      `ggplot(mtcars, aes(x = factor(cyl), y = mpg)) + geom_boxplot()`
@@ -145,13 +105,6 @@ test_that("model can add means to a boxplot", {
 })
 
 test_that("model can move a legend", {
-  chat <- provider(
-    model = model,
-    system_prompt = "When asked a question about R code, reply with only the
-                     code needed to answer the question. No exposition, no
-                     backticks."
-  )
-
   input <- input(
     "Move the legend to the top left, slightly inside the grey pane:
      `ggplot(mtcars) + aes(x = cyl, fill = factor(vs)) + geom_bar()`
@@ -175,13 +128,6 @@ test_that("model can move a legend", {
 })
 
 test_that("model can use subscript in axis label", {
-  chat <- provider(
-    model = model,
-    system_prompt = "When asked a question about R code, reply with only the
-                     code needed to answer the question. No exposition, no
-                     backticks."
-  )
-
   input <- input(
     "Make the 2 a subscript in the label:
      `ggplot(CO2) + aes(x = uptake) + geom_histogram() + labs(x = 'CO_2 Uptake')`
