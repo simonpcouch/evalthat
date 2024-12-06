@@ -51,6 +51,8 @@ evaluate_impl <- function(path,
     reporter <- reporter %||% EvalProgressReporter$new()
   }
 
+  reporter$start_reporter()
+  withr::defer(reporter$end_reporter())
   test_files_serial(
     test_dir = eval_files$eval_dir,
     test_package = NULL,

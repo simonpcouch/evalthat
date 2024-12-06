@@ -42,7 +42,16 @@ evaluate_across <- function(path = ".", across = tibble(), repeats = 1L, ...) {
   for (i in seq_len(nrow(across))) {
     withr::with_options(
       across[i,],
-      evaluate_impl(path = path, repeats = repeats, reporter = reporter, ...)
+      test_files_serial(
+        test_dir = eval_files$eval_dir,
+        test_package = NULL,
+        load_package = "none",
+        test_paths = rep(
+          file.path(eval_files$eval_dir, eval_files$eval_files),
+          times = repeats
+        ),
+        reporter = reporter
+      )
     )
   }
 }
