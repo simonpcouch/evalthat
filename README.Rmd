@@ -93,7 +93,7 @@ evaluate_across(
 
 ![](inst/ex_eval.gif)
 
-Then, `results_read()` will return a data frame with information on the evaluation results:
+Then, `results_read()` will return a data frame with information on the evaluation results for further analysis. Visualizing this example output:
 
 ```{r, eval = FALSE, include = FALSE}
 # read in and save the results for the package:
