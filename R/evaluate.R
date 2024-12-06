@@ -43,26 +43,24 @@ evaluate_impl <- function(path,
 
   withr::local_envvar(devtools::r_env_vars())
 
-  if (identical(repeats, 1L) &&
+  if (repeats == 1 &&
       is.null(reporter) &&
       length(eval_files$eval_files) == 1) {
-    testthat::test_file(
-      path,
-      reporter = EvalCompactProgressReporter$new(),
-      ...
-    )
+    reporter <- EvalCompactProgressReporter$new()
   } else {
-    test_files_serial(
-      test_dir = eval_files$eval_dir,
-      test_package = NULL,
-      load_package = "none",
-      test_paths = rep(
-        file.path(eval_files$eval_dir, eval_files$eval_files),
-        times = repeats
-      ),
-      reporter = reporter %||% EvalProgressReporter$new()
-    )
+    reporter <- reporter %||% EvalProgressReporter$new()
   }
+
+  test_files_serial(
+    test_dir = eval_files$eval_dir,
+    test_package = NULL,
+    load_package = "none",
+    test_paths = rep(
+      file.path(eval_files$eval_dir, eval_files$eval_files),
+      times = repeats
+    ),
+    reporter = reporter
+  )
 }
 
 active_eval_file <- function(arg = "file", call = parent.frame()) {

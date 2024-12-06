@@ -229,7 +229,7 @@ EvalProgressReporter <- R6::R6Class(
       subdir <- file_name_to_context(self$file_name)
       timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
 
-      results_dir <- file.path("_results", subdir)
+      results_dir <- file.path(dirname(self$file_name), "_results", subdir)
       if (!dir.exists(results_dir)) {
         dir.create(results_dir, recursive = TRUE)
       }
