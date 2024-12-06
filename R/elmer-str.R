@@ -13,9 +13,6 @@ str.Chat <- function(object, ...) {
     extra_args <- paste0(" (", paste(extra_args, collapse = ", "), ")")
   }
 
-  # cli::format_inline(
-  #   "{provider_name} {cli::col_blue(model)} chat {cli::col_green(extra_args)}"
-  # )
   cli::format_inline(
     "{provider_name} {model}{extra_args}"
   )
