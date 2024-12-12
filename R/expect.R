@@ -15,6 +15,9 @@
 #'
 #' @export
 expect_r_code <- function(object) {
+  r_language <- treesitter.r::language()
+  r_parser <- treesitter::parser(r_language)
+
   tree <- treesitter::parser_parse(r_parser, object)
   node <- treesitter::tree_root_node(tree)
 
