@@ -1,3 +1,4 @@
+# TODO: EvalProgressReporter$show_status may need to transition to this
 summary_line <- function(n_fail, n_warn, n_skip, n_pass, context, width) {
   colorize_if <- function(text, color, cond) {
     if (cond) colorize(text, color) else text

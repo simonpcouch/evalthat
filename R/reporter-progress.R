@@ -425,7 +425,7 @@ EvalCompactProgressReporter <- R6::R6Class(
         self$n_warn,
         self$n_skip,
         self$n_ok,
-        context = self$ctxt_name,
+        context = file_name_to_context(self$file_name),
         width = self$width
       )
       self$cat_tight(self$cr(), status)
