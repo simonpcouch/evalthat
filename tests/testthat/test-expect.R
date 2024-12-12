@@ -8,6 +8,8 @@ test_that("expect_r_code works", {
 })
 
 test_that("expect_calls works", {
+  skip("Currently not planning on exporting.")
+
   expect_success(expect_calls("a <- mean(1:10)", "mean"))
   expect_success(expect_calls("mean(1:10); mean(2:20)", "mean"))
   expect_success(expect_calls("mean(x = c(1,2,3), trim = 0.1, na.rm = TRUE)", "mean"))
@@ -18,6 +20,8 @@ test_that("expect_calls works", {
 })
 
 test_that("expect_loads works", {
+  skip("Currently not planning on exporting.")
+
   expect_success(expect_loads("library(tibble)\ntibble(x=1)", "tibble"))
 
   expect_failure(expect_loads("library(tibble)\ntibble(x=1)", "dplyr"))

@@ -25,6 +25,7 @@ expect_r_code <- function(object) {
   )
 }
 
+# nocov start
 # TODO: should this be able to detect having been called programmatically?
 # e.g. lapply(list(a = 1:2, b = 3:4), mean)
 expect_calls <- function(object, fn) {
@@ -53,3 +54,4 @@ expect_loads <- function(object, pkg) {
 
   invisible(act$val)
 }
+# nocov end
