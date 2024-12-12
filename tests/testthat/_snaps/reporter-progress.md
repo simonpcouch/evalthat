@@ -13,7 +13,6 @@
     \    1    1 | tests [variable]                                                  
     |    1    2 | tests [variable]                                                  
     ✓    1    2 | tests [variable] (33.3%)
-    
 
 # EvalCompactProgressReporter works
 
