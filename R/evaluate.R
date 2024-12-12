@@ -125,7 +125,7 @@ test_files_serial <- function(test_dir,
   testthat:::local_testing_env(env)
 
   reporters <- testthat:::test_files_reporter(reporter)
-  testthat:::with_reporter(
+  testthat::with_reporter(
     reporters$multi,
     lapply(
       test_paths,

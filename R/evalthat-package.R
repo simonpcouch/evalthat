@@ -8,11 +8,13 @@
 #' @importFrom R6 R6Class
 #' @importFrom treesitter.r language
 #' @importFrom tibble tibble
+#' @importFrom elmer chat_claude
 #
 ## usethis namespace: end
 NULL
 
 utils::globalVariables(c(
+  "%>%",
   "desc",
   "expect",
   "get_reporter",
@@ -22,5 +24,7 @@ utils::globalVariables(c(
   "pct",
   "quasi_label",
   "rgb",
+  "r_language",
+  "r_parser",
   "timestamp"
 ))
