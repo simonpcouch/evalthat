@@ -14,12 +14,27 @@ results_read <- function(dir = NULL) {
   dir <- paste0("tests/evalthat/_results", dir, collapse = "/")
   result_files <- list.files(dir, full.names = TRUE, recursive = TRUE)
 
-  res <- tibble::tibble()
+  res <- list()
   for (file in result_files) {
-    res <- vctrs::vec_rbind(res, qs::qread(file))
+    res <- c(res, qs::qread(file))
   }
 
-  dplyr::arrange(res, desc(timestamp)) %>%
-    tidyr::unnest_wider(col = evaluating) %>%
-    structure(class = c("evals_df", class(res)))
+  results_tibble(res)
+}
+
+results_tibble <- function(results = evalthat_env$last_result) {
+  res <- tibble::tibble()
+  for (result in results) {
+    res <- vctrs::vec_rbind(res, result)
+  }
+
+  if (nrow(res) == 0) {return(evals_df(res))}
+
+  res <- dplyr::arrange(res, desc(timestamp))
+  res <- tidyr::unnest_wider(res, col = evaluating)
+  evals_df(res)
+}
+
+evals_df <- function(tbl) {
+  structure(tbl, class = c("evals_df", class(tbl)))
 }

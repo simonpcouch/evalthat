@@ -244,16 +244,21 @@ EvalProgressReporter <- R6::R6Class(
     #'
     #' @param timestamp DTTM as `format(Sys.time(), "%Y%m%d_%H%M%S")`.
     result_summary = function(timestamp) {
-      tibble::tibble(
-        evaluating = list(self$ctxt_name),
-        pct = self$n_ok * 100 / max(self$n_fail + self$n_ok, 1),
-        n_fail = self$n_fail,
-        n_pass = self$n_ok,
-        timestamp = timestamp,
-        file_hash = hash_file(self$file_name),
-        io = list(self$io),
-        problems = list(self$problems$as_list())
-      )
+      res <-
+        tibble::tibble(
+          evaluating = list(self$ctxt_name),
+          pct = self$n_ok * 100 / max(self$n_fail + self$n_ok, 1),
+          n_fail = self$n_fail,
+          n_pass = self$n_ok,
+          timestamp = timestamp,
+          file_hash = hash_file(self$file_name),
+          io = list(self$io),
+          problems = list(self$problems$as_list())
+        )
+
+      evalthat_env$last_result <- c(evalthat_env$last_result, list(res))
+
+      res
     },
 
     #' @description
@@ -297,10 +302,16 @@ EvalProgressReporter <- R6::R6Class(
     },
 
     #' @description
+    #' Start the current reporter.
+    start_reporter = function() {
+      evalthat_env$last_result <- list()
+      self$start_time <- proc.time()
+      self$show_header()
+    },
+
+    #' @description
     #' Tear down the current reporter.
     end_reporter = function() {
-      self$cat_line()
-
       colour_if <- function(n, type) {
         colorize(n, if (n == 0) "success" else type)
       }
@@ -308,16 +319,7 @@ EvalProgressReporter <- R6::R6Class(
       time <- proc.time() - self$start_time
       if (time[[3]] > self$min_time) {
         self$cat_line("Duration: ", sprintf("%.1f s", time[[3]]), col = "cyan")
-        self$cat_line()
       }
-
-      if (self$problems$size() > 0) {
-        self$cat_tight(cli::format_inline(
-          "See {.field problems} in {.fun results_read} for more information on failures."
-        ))
-      }
-
-      self$cat_line()
     },
 
     #' @description
@@ -379,6 +381,7 @@ EvalCompactProgressReporter <- R6::R6Class(
     #'
     #' @param context Context, formed from `evaluating()`.
     start_reporter = function(context) {
+      evalthat_env$last_result <- list()
     },
 
     #' @description
@@ -395,23 +398,12 @@ EvalCompactProgressReporter <- R6::R6Class(
     #'
     #' @param context Context, formed from `evaluating()`.
     end_context = function(context) {
-      if (self$ctxt_issues$size() == 0) {
-        return()
-      }
-
-      self$cat_line()
-      self$cat_line()
-
-      self$cat_tight(cli::format_inline(
-        "See {.field problems} in {.fun results_read} for more information on failures."
-      ))
     },
 
     #' @description
     #' Teardown.
     end_reporter = function() {
       self$save_results()
-      self$cat_line()
     },
 
     #' @description

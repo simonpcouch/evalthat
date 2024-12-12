@@ -21,7 +21,11 @@ quantify the variability of your evaluations.}
 \item{...}{Additional arguments passed to internal functions.}
 }
 \value{
-Results of the evaluation, invisibly. Mostly called for its side-effects:
+Results of the evaluation, invisibly. Evaluation results contain information
+on the eval metadata set in \code{evaluating()} as well as numbers of failures
+and passes, input and output, and descriptions of each failure.
+
+The function also has side-effects:
 \itemize{
 \item An interactive progress interface tracking results in real-time.
 \item \emph{Result files} are stored in \verb{dirname(path)/_results}. Result files contain

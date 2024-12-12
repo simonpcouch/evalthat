@@ -1,3 +1,83 @@
+test_that("`evaluate()` returns results as a tibble (eval reporter)", {
+  capture_output_lines(
+    results <- evaluate(test_path("reporters", "tests.R"), repeats = 2)
+  )
+
+  expect_s3_class(results, "tbl_df")
+  expect_equal(nrow(results), 2)
+  expect_named(
+    results,
+    c("important", "pct", "n_fail", "n_pass", "timestamp", "file_hash",
+      "io", "problems"),
+    ignore.order = TRUE
+  )
+})
+
+test_that("`evaluate()` returns results as a tibble (compact reporter)", {
+  capture_output_lines(
+    results <- evaluate(test_path("reporters", "tests.R"), repeats = 1)
+  )
+
+  expect_s3_class(results, "tbl_df")
+  expect_equal(nrow(results), 1)
+  expect_named(
+    results,
+    c("important", "pct", "n_fail", "n_pass", "timestamp", "file_hash",
+      "io", "problems"),
+    ignore.order = TRUE
+  )
+})
+
+test_that("`evaluate_active_file()` returns results as a tibble (eval reporter)", {
+  capture_output_lines(
+    results <- evaluate_active_file(test_path("reporters", "tests.R"), repeats = 2)
+  )
+
+  expect_s3_class(results, "tbl_df")
+  expect_equal(nrow(results), 2)
+  expect_named(
+    results,
+    c("important", "pct", "n_fail", "n_pass", "timestamp", "file_hash",
+      "io", "problems"),
+    ignore.order = TRUE
+  )
+})
+
+test_that("`evaluate_active_file()` returns results as a tibble (compact reporter)", {
+  capture_output_lines(
+    results <- evaluate_active_file(test_path("reporters", "tests.R"), repeats = 1)
+  )
+
+  expect_s3_class(results, "tbl_df")
+  expect_equal(nrow(results), 1)
+  expect_named(
+    results,
+    c("important", "pct", "n_fail", "n_pass", "timestamp", "file_hash",
+      "io", "problems"),
+    ignore.order = TRUE
+  )
+})
+
+test_that("results tibbles are returned invisibly", {
+  capture_output_lines(
+    expect_invisible(
+      evaluate(test_path("reporters", "tests.R"), repeats = 1)
+    )
+  )
+
+  capture_output_lines(
+    expect_invisible(
+      evaluate(test_path("reporters", "tests.R"), repeats = 2)
+    )
+  )
+
+  capture_output_lines(
+    expect_invisible(
+      evaluate_active_file(test_path("reporters", "tests.R"), repeats = 1)
+    )
+  )
+})
+
 test_that("recognizes eval files", {
   expect_true(is_eval_file("tests/evalthat/test-something.R"))
   expect_true(is_eval_file("path/to/evalthat/test-something.r"))

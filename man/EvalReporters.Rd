@@ -66,6 +66,7 @@ same as those without the \verb{ctxt_*} prefix, but per-context.}
 \item \href{#method-EvalProgressReporter-save_results}{\code{EvalProgressReporter$save_results()}}
 \item \href{#method-EvalProgressReporter-result_summary}{\code{EvalProgressReporter$result_summary()}}
 \item \href{#method-EvalProgressReporter-add_result}{\code{EvalProgressReporter$add_result()}}
+\item \href{#method-EvalProgressReporter-start_reporter}{\code{EvalProgressReporter$start_reporter()}}
 \item \href{#method-EvalProgressReporter-end_reporter}{\code{EvalProgressReporter$end_reporter()}}
 \item \href{#method-EvalProgressReporter-report_issues}{\code{EvalProgressReporter$report_issues()}}
 \item \href{#method-EvalProgressReporter-clone}{\code{EvalProgressReporter$clone()}}
@@ -87,7 +88,6 @@ same as those without the \verb{ctxt_*} prefix, but per-context.}
 <li><span class="pkg-link" data-pkg="testthat" data-topic="ProgressReporter" data-id="cr"><a href='../../testthat/html/ProgressReporter.html#method-ProgressReporter-cr'><code>testthat::ProgressReporter$cr()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="ProgressReporter" data-id="initialize"><a href='../../testthat/html/ProgressReporter.html#method-ProgressReporter-initialize'><code>testthat::ProgressReporter$initialize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="ProgressReporter" data-id="should_update"><a href='../../testthat/html/ProgressReporter.html#method-ProgressReporter-should_update'><code>testthat::ProgressReporter$should_update()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="ProgressReporter" data-id="start_reporter"><a href='../../testthat/html/ProgressReporter.html#method-ProgressReporter-start_reporter'><code>testthat::ProgressReporter$start_reporter()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="ProgressReporter" data-id="status_data"><a href='../../testthat/html/ProgressReporter.html#method-ProgressReporter-status_data'><code>testthat::ProgressReporter$status_data()</code></a></span></li>
 </ul>
 </details>
@@ -283,6 +283,16 @@ Append a given \verb{expect_*()} or \verb{grade_*()} result to the current conte
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-EvalProgressReporter-start_reporter"></a>}}
+\if{latex}{\out{\hypertarget{method-EvalProgressReporter-start_reporter}{}}}
+\subsection{Method \code{start_reporter()}}{
+Start the current reporter.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$start_reporter()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-EvalProgressReporter-end_reporter"></a>}}

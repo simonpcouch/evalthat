@@ -14,7 +14,11 @@
 #' @param ... Additional arguments passed to internal functions.
 #'
 #' @returns
-#' Results of the evaluation, invisibly. Mostly called for its side-effects:
+#' Results of the evaluation, invisibly. Evaluation results contain information
+#' on the eval metadata set in `evaluating()` as well as numbers of failures
+#' and passes, input and output, and descriptions of each failure.
+#'
+#' The function also has side-effects:
 #'
 #' * An interactive progress interface tracking results in real-time.
 #' * _Result files_ are stored in `dirname(path)/_results`. Result files contain
@@ -24,12 +28,16 @@
 #' @export
 evaluate <- function(path = ".", repeats = 1L, ...) {
   evaluate_impl(path = path, repeats = repeats, ...)
+
+  invisible(results_tibble())
 }
 
 #' @rdname evaluate
 #' @export
 evaluate_active_file <- function(path = active_eval_file(), repeats = 1L, ...) {
   evaluate_impl(path = path, repeats = repeats, ...)
+
+  invisible(results_tibble())
 }
 
 evaluate_impl <- function(path,
@@ -63,6 +71,8 @@ evaluate_impl <- function(path,
     ),
     reporter = reporter
   )
+
+  invisible(results_tibble())
 }
 
 active_eval_file <- function(arg = "file", call = parent.frame()) {

@@ -88,7 +88,7 @@ library(elmer)
 
 temp <- list(temperature = 1)
 
-evaluate_across(
+eval <- evaluate_across(
   "tests/evalthat/test-ggplot2.R",
   tibble(chat = c(
     chat_openai(model = "gpt-4o", api_args = temp, echo = FALSE),
@@ -101,8 +101,31 @@ evaluate_across(
 
 ![](inst/ex_eval.gif)
 
-Then, `results_read()` will return a data frame with information on the
-evaluation results for further analysis. Visualizing this example
-output:
+Evaluation functions return a data frame with information on the
+evaluation results for further analysis:
+
+``` r
+eval
+#> # A tibble: 15 × 8
+#>    model             pct n_fail n_pass timestamp file_hash io           problems
+#>    <chr>           <dbl>  <dbl>  <dbl> <chr>     <chr>     <list>       <list>  
+#>  1 Claude claude-… 100        0     40 20241206… 6206db86… <named list> <list>  
+#>  2 Claude claude-…  95        2     38 20241206… 6206db86… <named list> <list>  
+#>  3 Claude claude-… 100        0     40 20241206… 6206db86… <named list> <list>  
+#>  4 Claude claude-… 100        0     40 20241206… 6206db86… <named list> <list>  
+#>  5 Claude claude-… 100        0     40 20241206… 6206db86… <named list> <list>  
+#>  6 OpenAI gpt-4o-…  92.5      3     37 20241206… 6206db86… <named list> <list>  
+#>  7 OpenAI gpt-4o-…  97.5      1     39 20241206… 6206db86… <named list> <list>  
+#>  8 OpenAI gpt-4o-… 100        0     40 20241206… 6206db86… <named list> <list>  
+#>  9 OpenAI gpt-4o-…  97.5      1     39 20241206… 6206db86… <named list> <list>  
+#> 10 OpenAI gpt-4o-…  97.5      1     39 20241206… 6206db86… <named list> <list>  
+#> 11 OpenAI gpt-4o …  97.5      1     39 20241206… 6206db86… <named list> <list>  
+#> 12 OpenAI gpt-4o …  95        2     38 20241206… 6206db86… <named list> <list>  
+#> 13 OpenAI gpt-4o …  95        2     38 20241206… 6206db86… <named list> <list>  
+#> 14 OpenAI gpt-4o …  95        2     38 20241206… 6206db86… <named list> <list>  
+#> 15 OpenAI gpt-4o …  97.5      1     39 20241206… 6206db86… <named list> <list>
+```
+
+Visualizing this example output:
 
 <img src="inst/ex_plot.png" alt="A ggplot2 histogram, showing distributions of performance on the task 'translating R erroring code to cli' for three different models: Claude 3.5 Sonner, GPT-4o, and GPT-4o-mini. They all pass with flying colors, probably indicating the need for a harder eval." width="100%" />

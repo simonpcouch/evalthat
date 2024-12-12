@@ -5,7 +5,10 @@ output: github_document
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r, include = FALSE}
+should_eval <- getOption(".evalthat_eval_readme", default = FALSE)
+
 knitr::opts_chunk$set(
+  eval = should_eval,
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
@@ -77,12 +80,12 @@ testthat users will notice a couple changes:
 
 Running the above test file results in a persistent _result file_—think of it like a snapshot. evalthat supplies a number of helpers for working with result files, allowing you to compare performance across various models, iterate on prompts, quantify variability in output, and so on. On the full ggplot2 example file, we could run 5 passes evaluating several different models for revising ggplot2 code:
 
-```{r, eval = FALSE}
+```{r}
 library(elmer)
 
 temp <- list(temperature = 1)
 
-evaluate_across(
+eval <- evaluate_across(
   "tests/evalthat/test-ggplot2.R",
   tibble(chat = c(
     chat_openai(model = "gpt-4o", api_args = temp, echo = FALSE),
@@ -95,19 +98,27 @@ evaluate_across(
 
 ![](inst/ex_eval.gif)
 
-Then, `results_read()` will return a data frame with information on the evaluation results for further analysis. Visualizing this example output:
+Evaluation functions return a data frame with information on the evaluation results for further analysis:
 
-```{r, eval = FALSE, include = FALSE}
-# read in and save the results for the package:
-ex_ggplot2 <- results_read()
-qs::qsave(ex_ggplot2, "inst/ex_ggplot2.rds")
+```{r, eval = TRUE, include = FALSE}
+if (!should_eval) {
+  eval <- qs::qread("inst/ex_ggplot2.rds")
+  eval <- tibble::as_tibble(eval)
+} else {
+  qs::qsave(eval, "inst/ex_ggplot2.rds")
+}
 ```
 
-```{r, eval = FALSE, include = FALSE}
-ex_ggplot2 <- qs::qread("inst/ex_ggplot2.rds")
+```{r, eval = TRUE}
+eval
+```
+
+Visualizing this example output:
+
+```{r, include = FALSE}
 library(tidyverse)
 
-plot <- ex_ggplot2 %>% 
+plot <- eval %>% 
   ggplot() +
   aes(x = pct, fill = model) +
   geom_histogram(position = "identity", alpha = .5) +
@@ -128,6 +139,6 @@ plot
 ggsave("inst/ex_plot.png", width = 5.5, height = 4, plot)
 ```
 
-```{r, echo = FALSE, fig.alt="A ggplot2 histogram, showing distributions of performance on the task 'translating R erroring code to cli' for three different models: Claude 3.5 Sonner, GPT-4o, and GPT-4o-mini. They all pass with flying colors, probably indicating the need for a harder eval."}
+```{r, eval = TRUE, echo = FALSE, fig.alt="A ggplot2 histogram, showing distributions of performance on the task 'translating R erroring code to cli' for three different models: Claude 3.5 Sonner, GPT-4o, and GPT-4o-mini. They all pass with flying colors, probably indicating the need for a harder eval."}
 knitr::include_graphics("inst/ex_plot.png")
 ```
