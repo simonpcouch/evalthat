@@ -5,12 +5,15 @@
 #' [devtools::test()] and [devtools::test_active_file()], though note that
 #' `evaluate()` can take either a directory of files or a single file.
 #'
+#' @param path Path to the directory or file containing the evaluation code.
+#' @param across A data frame where each column represents an option to be set
+#' when evaluating the file at `path` and each row represents a pass through
+#' that file.
 #' @param repeats A single positive integer specifying the number of
 #' evaluation repeats, or runs over the same test files. Assuming that the
 #' models you're evaluating provide non-deterministic output, running the
 #' same test files multiple times by setting `repeats > 1` will help you
 #' quantify the variability of your evaluations.
-#' @param path Path to the directory or file in question. Optional.
 #' @param ... Additional arguments passed to internal functions.
 #'
 #' @returns
@@ -25,26 +28,41 @@
 #' persistent, fine-grained evaluation results and can be interfaced with
 #' via [results_read()] and friends.
 #'
+#' @examplesIf FALSE
+#' # evaluate a directory of evals across several models,
+#' # repeating each eval twice
+#' eval <- evaluate(
+#'   "tests/evalthat/test-ggplot2.R",
+#'   across = tibble(chat = c(
+#'     chat_openai(model = "gpt-4o-mini", echo = FALSE),
+#'     chat_claude(model = "claude-3-5-sonnet-latest", echo = FALSE))
+#'   ),
+#'   repeats = 2
+#' )
+#'
 #' @export
-evaluate <- function(path = ".", repeats = 1L, ...) {
-  evaluate_impl(path = path, repeats = repeats, ...)
+evaluate <- function(path = ".", across = tibble(), repeats = 1L, ...) {
+  evaluate_impl(path = path, across = across, repeats = repeats, ...)
 
   invisible(results_tibble())
 }
 
 #' @rdname evaluate
 #' @export
-evaluate_active_file <- function(path = active_eval_file(), repeats = 1L, ...) {
-  evaluate_impl(path = path, repeats = repeats, ...)
+evaluate_active_file <- function(path = active_eval_file(), across = tibble(),
+                                 repeats = 1L, ...) {
+  evaluate_impl(path = path, across = across, repeats = repeats, ...)
 
   invisible(results_tibble())
 }
 
 evaluate_impl <- function(path,
+                          across,
                           repeats,
                           ...,
                           reporter = NULL,
                           call = caller_env()) {
+  check_data_frame(across)
   check_number_whole(repeats, min = 1, allow_infinite = FALSE, call = call)
 
   eval_files <- eval_files(path)
@@ -53,7 +71,8 @@ evaluate_impl <- function(path,
 
   if (repeats == 1 &&
       is.null(reporter) &&
-      length(eval_files$eval_files) == 1) {
+      length(eval_files$eval_files) == 1 &&
+      nrow(across) < 2) {
     reporter <- EvalCompactProgressReporter$new()
   } else {
     reporter <- reporter %||% EvalProgressReporter$new()
@@ -61,15 +80,19 @@ evaluate_impl <- function(path,
 
   reporter$start_reporter()
   withr::defer(reporter$end_reporter())
-  test_files_serial(
-    test_dir = eval_files$eval_dir,
-    test_package = NULL,
-    load_package = "none",
-    test_paths = rep(
-      file.path(eval_files$eval_dir, eval_files$eval_files),
-      times = repeats
-    ),
-    reporter = reporter
+  purrr::pmap(
+    across,
+    ~test_files_serial(
+      test_dir = eval_files$eval_dir,
+      test_package = NULL,
+      load_package = "none",
+      test_paths = rep(
+        file.path(eval_files$eval_dir, eval_files$eval_files),
+        times = repeats
+      ),
+      env = new_environment(data = list(...), test_env()),
+      reporter = reporter
+    )
   )
 
   invisible(results_tibble())

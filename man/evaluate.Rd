@@ -5,12 +5,21 @@
 \alias{evaluate_active_file}
 \title{Evaluate LLM performance}
 \usage{
-evaluate(path = ".", repeats = 1L, ...)
+evaluate(path = ".", across = tibble(), repeats = 1L, ...)
 
-evaluate_active_file(path = active_eval_file(), repeats = 1L, ...)
+evaluate_active_file(
+  path = active_eval_file(),
+  across = tibble(),
+  repeats = 1L,
+  ...
+)
 }
 \arguments{
-\item{path}{Path to the directory or file in question. Optional.}
+\item{path}{Path to the directory or file containing the evaluation code.}
+
+\item{across}{A data frame where each column represents an option to be set
+when evaluating the file at \code{path} and each row represents a pass through
+that file.}
 
 \item{repeats}{A single positive integer specifying the number of
 evaluation repeats, or runs over the same test files. Assuming that the
@@ -37,4 +46,18 @@ via \code{\link[=results_read]{results_read()}} and friends.
 \code{evaluate()} and \code{evaluate_active_file()} are roughly analogous to
 \code{\link[devtools:test]{devtools::test()}} and \code{\link[devtools:test]{devtools::test_active_file()}}, though note that
 \code{evaluate()} can take either a directory of files or a single file.
+}
+\examples{
+\dontshow{if (FALSE) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+# evaluate a directory of evals across several models,
+# repeating each eval twice
+eval <- evaluate(
+  "tests/evalthat/test-ggplot2.R",
+  across = tibble(chat = c(
+    chat_openai(model = "gpt-4o-mini", echo = FALSE),
+    chat_claude(model = "claude-3-5-sonnet-latest", echo = FALSE))
+  ),
+  repeats = 2
+)
+\dontshow{\}) # examplesIf}
 }

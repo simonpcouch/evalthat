@@ -78,9 +78,9 @@ library(ellmer)
 
 temp <- list(temperature = 1)
 
-eval <- evaluate_across(
+eval <- evaluate(
   "tests/evalthat/test-ggplot2.R",
-  tibble(chat = c(
+  across = tibble(chat = c(
     chat_openai(model = "gpt-4o", api_args = temp, echo = FALSE),
     chat_openai(model = "gpt-4o-mini", api_args = temp, echo = FALSE),
     chat_claude(model = "claude-3-5-sonnet-latest", echo = FALSE))

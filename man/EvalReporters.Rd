@@ -68,7 +68,7 @@ same as those without the \verb{ctxt_*} prefix, but per-context.}
 \item \href{#method-EvalProgressReporter-add_result}{\code{EvalProgressReporter$add_result()}}
 \item \href{#method-EvalProgressReporter-start_reporter}{\code{EvalProgressReporter$start_reporter()}}
 \item \href{#method-EvalProgressReporter-end_reporter}{\code{EvalProgressReporter$end_reporter()}}
-\item \href{#method-EvalProgressReporter-report_issues}{\code{EvalProgressReporter$report_issues()}}
+\item \href{#method-EvalProgressReporter-end_file}{\code{EvalProgressReporter$end_file()}}
 \item \href{#method-EvalProgressReporter-clone}{\code{EvalProgressReporter$clone()}}
 }
 }
@@ -79,7 +79,6 @@ same as those without the \verb{ctxt_*} prefix, but per-context.}
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="cat_line"><a href='../../testthat/html/Reporter.html#method-Reporter-cat_line'><code>testthat::Reporter$cat_line()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="cat_tight"><a href='../../testthat/html/Reporter.html#method-Reporter-cat_tight'><code>testthat::Reporter$cat_tight()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="end_context_if_started"><a href='../../testthat/html/Reporter.html#method-Reporter-end_context_if_started'><code>testthat::Reporter$end_context_if_started()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="end_file"><a href='../../testthat/html/Reporter.html#method-Reporter-end_file'><code>testthat::Reporter$end_file()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="end_test"><a href='../../testthat/html/Reporter.html#method-Reporter-end_test'><code>testthat::Reporter$end_test()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="local_user_output"><a href='../../testthat/html/Reporter.html#method-Reporter-local_user_output'><code>testthat::Reporter$local_user_output()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="rule"><a href='../../testthat/html/Reporter.html#method-Reporter-rule'><code>testthat::Reporter$rule()</code></a></span></li>
@@ -87,6 +86,7 @@ same as those without the \verb{ctxt_*} prefix, but per-context.}
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="update"><a href='../../testthat/html/Reporter.html#method-Reporter-update'><code>testthat::Reporter$update()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="ProgressReporter" data-id="cr"><a href='../../testthat/html/ProgressReporter.html#method-ProgressReporter-cr'><code>testthat::ProgressReporter$cr()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="ProgressReporter" data-id="initialize"><a href='../../testthat/html/ProgressReporter.html#method-ProgressReporter-initialize'><code>testthat::ProgressReporter$initialize()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="testthat" data-topic="ProgressReporter" data-id="report_issues"><a href='../../testthat/html/ProgressReporter.html#method-ProgressReporter-report_issues'><code>testthat::ProgressReporter$report_issues()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="ProgressReporter" data-id="should_update"><a href='../../testthat/html/ProgressReporter.html#method-ProgressReporter-should_update'><code>testthat::ProgressReporter$should_update()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="ProgressReporter" data-id="status_data"><a href='../../testthat/html/ProgressReporter.html#method-ProgressReporter-status_data'><code>testthat::ProgressReporter$status_data()</code></a></span></li>
 </ul>
@@ -175,13 +175,13 @@ Sets the values of \verb{res_*} fields to \code{numeric()} and calls
 \subsection{Method \code{start_context()}}{
 Resets counters and initiates a progress bar.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$start_context(context)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$start_context(env)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{context}}{The current test context.}
+\item{\code{env}}{The current testing env.}
 }
 \if{html}{\out{</div>}}
 }
@@ -223,16 +223,9 @@ Tabulate successes and failures in the current context.
 \subsection{Method \code{end_context()}}{
 Teardown following the test run.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$end_context(context)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$end_context()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{context}}{Context from \code{\link[=evaluating]{evaluating()}}.}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-EvalProgressReporter-save_results"></a>}}
@@ -278,8 +271,6 @@ Append a given \verb{expect_*()} or \verb{grade_*()} result to the current conte
 \item{\code{context}}{Context from \code{\link[=evaluating]{evaluating()}}.}
 
 \item{\code{test}}{The name of the test block.}
-
-\item{\code{result}}{The \code{expectation} result, returned by an \code{expect_} function.}
 }
 \if{html}{\out{</div>}}
 }
@@ -305,21 +296,13 @@ Tear down the current reporter.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-EvalProgressReporter-report_issues"></a>}}
-\if{latex}{\out{\hypertarget{method-EvalProgressReporter-report_issues}{}}}
-\subsection{Method \code{report_issues()}}{
-Print issues to the screen.
+\if{html}{\out{<a id="method-EvalProgressReporter-end_file"></a>}}
+\if{latex}{\out{\hypertarget{method-EvalProgressReporter-end_file}{}}}
+\subsection{Method \code{end_file()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$report_issues(issues)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$end_file()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{issues}}{Issues.}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-EvalProgressReporter-clone"></a>}}
@@ -348,8 +331,6 @@ The objects of this class are cloneable with this method.
 \item \href{#method-EvalCompactProgressReporter-new}{\code{EvalCompactProgressReporter$new()}}
 \item \href{#method-EvalCompactProgressReporter-start_file}{\code{EvalCompactProgressReporter$start_file()}}
 \item \href{#method-EvalCompactProgressReporter-start_reporter}{\code{EvalCompactProgressReporter$start_reporter()}}
-\item \href{#method-EvalCompactProgressReporter-start_context}{\code{EvalCompactProgressReporter$start_context()}}
-\item \href{#method-EvalCompactProgressReporter-end_context}{\code{EvalCompactProgressReporter$end_context()}}
 \item \href{#method-EvalCompactProgressReporter-end_reporter}{\code{EvalCompactProgressReporter$end_reporter()}}
 \item \href{#method-EvalCompactProgressReporter-show_status}{\code{EvalCompactProgressReporter$show_status()}}
 \item \href{#method-EvalCompactProgressReporter-clone}{\code{EvalCompactProgressReporter$clone()}}
@@ -362,22 +343,24 @@ The objects of this class are cloneable with this method.
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="cat_line"><a href='../../testthat/html/Reporter.html#method-Reporter-cat_line'><code>testthat::Reporter$cat_line()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="cat_tight"><a href='../../testthat/html/Reporter.html#method-Reporter-cat_tight'><code>testthat::Reporter$cat_tight()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="end_context_if_started"><a href='../../testthat/html/Reporter.html#method-Reporter-end_context_if_started'><code>testthat::Reporter$end_context_if_started()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="end_file"><a href='../../testthat/html/Reporter.html#method-Reporter-end_file'><code>testthat::Reporter$end_file()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="end_test"><a href='../../testthat/html/Reporter.html#method-Reporter-end_test'><code>testthat::Reporter$end_test()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="local_user_output"><a href='../../testthat/html/Reporter.html#method-Reporter-local_user_output'><code>testthat::Reporter$local_user_output()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="rule"><a href='../../testthat/html/Reporter.html#method-Reporter-rule'><code>testthat::Reporter$rule()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="start_test"><a href='../../testthat/html/Reporter.html#method-Reporter-start_test'><code>testthat::Reporter$start_test()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="update"><a href='../../testthat/html/Reporter.html#method-Reporter-update'><code>testthat::Reporter$update()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="ProgressReporter" data-id="cr"><a href='../../testthat/html/ProgressReporter.html#method-ProgressReporter-cr'><code>testthat::ProgressReporter$cr()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="testthat" data-topic="ProgressReporter" data-id="report_issues"><a href='../../testthat/html/ProgressReporter.html#method-ProgressReporter-report_issues'><code>testthat::ProgressReporter$report_issues()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="ProgressReporter" data-id="should_update"><a href='../../testthat/html/ProgressReporter.html#method-ProgressReporter-should_update'><code>testthat::ProgressReporter$should_update()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="ProgressReporter" data-id="status_data"><a href='../../testthat/html/ProgressReporter.html#method-ProgressReporter-status_data'><code>testthat::ProgressReporter$status_data()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="evalthat" data-topic="EvalProgressReporter" data-id="add_result"><a href='../../evalthat/html/EvalProgressReporter.html#method-EvalProgressReporter-add_result'><code>evalthat::EvalProgressReporter$add_result()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="evalthat" data-topic="EvalProgressReporter" data-id="end_context"><a href='../../evalthat/html/EvalProgressReporter.html#method-EvalProgressReporter-end_context'><code>evalthat::EvalProgressReporter$end_context()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="evalthat" data-topic="EvalProgressReporter" data-id="end_file"><a href='../../evalthat/html/EvalProgressReporter.html#method-EvalProgressReporter-end_file'><code>evalthat::EvalProgressReporter$end_file()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="evalthat" data-topic="EvalProgressReporter" data-id="is_full"><a href='../../evalthat/html/EvalProgressReporter.html#method-EvalProgressReporter-is_full'><code>evalthat::EvalProgressReporter$is_full()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="evalthat" data-topic="EvalProgressReporter" data-id="report_issues"><a href='../../evalthat/html/EvalProgressReporter.html#method-EvalProgressReporter-report_issues'><code>evalthat::EvalProgressReporter$report_issues()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="evalthat" data-topic="EvalProgressReporter" data-id="reset_counts"><a href='../../evalthat/html/EvalProgressReporter.html#method-EvalProgressReporter-reset_counts'><code>evalthat::EvalProgressReporter$reset_counts()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="evalthat" data-topic="EvalProgressReporter" data-id="result_summary"><a href='../../evalthat/html/EvalProgressReporter.html#method-EvalProgressReporter-result_summary'><code>evalthat::EvalProgressReporter$result_summary()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="evalthat" data-topic="EvalProgressReporter" data-id="save_results"><a href='../../evalthat/html/EvalProgressReporter.html#method-EvalProgressReporter-save_results'><code>evalthat::EvalProgressReporter$save_results()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="evalthat" data-topic="EvalProgressReporter" data-id="show_header"><a href='../../evalthat/html/EvalProgressReporter.html#method-EvalProgressReporter-show_header'><code>evalthat::EvalProgressReporter$show_header()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="evalthat" data-topic="EvalProgressReporter" data-id="start_context"><a href='../../evalthat/html/EvalProgressReporter.html#method-EvalProgressReporter-start_context'><code>evalthat::EvalProgressReporter$start_context()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="evalthat" data-topic="EvalProgressReporter" data-id="update_counts"><a href='../../evalthat/html/EvalProgressReporter.html#method-EvalProgressReporter-update_counts'><code>evalthat::EvalProgressReporter$update_counts()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="evalthat" data-topic="EvalProgressReporter" data-id="update_io"><a href='../../evalthat/html/EvalProgressReporter.html#method-EvalProgressReporter-update_io'><code>evalthat::EvalProgressReporter$update_io()</code></a></span></li>
 </ul>
@@ -425,50 +408,9 @@ Setup for a single file.
 \subsection{Method \code{start_reporter()}}{
 Setup.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EvalCompactProgressReporter$start_reporter(context)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{EvalCompactProgressReporter$start_reporter()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{context}}{Context, formed from \code{evaluating()}.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-EvalCompactProgressReporter-start_context"></a>}}
-\if{latex}{\out{\hypertarget{method-EvalCompactProgressReporter-start_context}{}}}
-\subsection{Method \code{start_context()}}{
-Setup.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EvalCompactProgressReporter$start_context(context)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{context}}{Context, formed from \code{evaluating()}.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-EvalCompactProgressReporter-end_context"></a>}}
-\if{latex}{\out{\hypertarget{method-EvalCompactProgressReporter-end_context}{}}}
-\subsection{Method \code{end_context()}}{
-Teardown.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EvalCompactProgressReporter$end_context(context)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{context}}{Context, formed from \code{evaluating()}.}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-EvalCompactProgressReporter-end_reporter"></a>}}
