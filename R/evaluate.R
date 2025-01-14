@@ -15,7 +15,7 @@
 #'
 #' @returns
 #' Results of the evaluation, invisibly. Evaluation results contain information
-#' on the eval metadata set in `evaluating()` as well as numbers of failures
+#' on the eval metadata as well as numbers of failures
 #' and passes, input and output, and descriptions of each failure.
 #'
 #' The function also has side-effects:
@@ -116,6 +116,7 @@ eval_files <- function(path, call = caller_env()) {
 }
 
 # copied from testthat so that we can set `start_end_reporter = FALSE` in `with_reporter()`
+# note: we now _also_ set data based on `across` in env
 test_files_serial <- function(test_dir,
                               test_package,
                               test_paths,
@@ -126,6 +127,7 @@ test_files_serial <- function(test_dir,
                               stop_on_failure = FALSE,
                               stop_on_warning = FALSE,
                               error_call = caller_env()) {
+  reporter$start_context(env)
   env <- testthat:::test_files_setup_env(
     test_package,
     test_dir,

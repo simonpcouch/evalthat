@@ -22,7 +22,7 @@ quantify the variability of your evaluations.}
 }
 \value{
 Results of the evaluation, invisibly. Evaluation results contain information
-on the eval metadata set in \code{evaluating()} as well as numbers of failures
+on the eval metadata as well as numbers of failures
 and passes, input and output, and descriptions of each failure.
 
 The function also has side-effects:
