@@ -13,14 +13,13 @@
 #' # evaluate a directory of evals across several models,
 #' # repeating each eval twice
 #' eval <- evaluate_across(
-#'   tibble(chat = c(
+#'   "tests/evalthat/test-ggplot2.R",
+#'   across = tibble(chat = c(
 #'     chat_openai(model = "gpt-4o-mini", echo = FALSE),
 #'     chat_claude(model = "claude-3-5-sonnet-latest", echo = FALSE))
 #'   ),
 #'   repeats = 2
 #' )
-#'
-#' eval
 #' @export
 evaluate_across <- function(path = ".", across = tibble(), repeats = 1L, ...) {
   check_data_frame(across)
@@ -31,21 +30,20 @@ evaluate_across <- function(path = ".", across = tibble(), repeats = 1L, ...) {
 
   reporter$start_reporter()
   withr::defer(reporter$end_reporter())
-  for (i in seq_len(nrow(across))) {
-    withr::with_options(
-      across[i,],
-      test_files_serial(
-        test_dir = eval_files$eval_dir,
-        test_package = NULL,
-        load_package = "none",
-        test_paths = rep(
-          file.path(eval_files$eval_dir, eval_files$eval_files),
-          times = repeats
-        ),
-        reporter = reporter
-      )
+  purrr::pmap(
+    across,
+    ~test_files_serial(
+      test_dir = eval_files$eval_dir,
+      test_package = NULL,
+      load_package = "none",
+      test_paths = rep(
+        file.path(eval_files$eval_dir, eval_files$eval_files),
+        times = repeats
+      ),
+      env = new_environment(data = list(...), test_env()),
+      reporter = reporter
     )
-  }
+  )
 
   invisible(results_tibble())
 }
