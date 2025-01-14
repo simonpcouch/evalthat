@@ -271,6 +271,8 @@ Append a given \verb{expect_*()} or \verb{grade_*()} result to the current conte
 \item{\code{context}}{Context from \code{\link[=evaluating]{evaluating()}}.}
 
 \item{\code{test}}{The name of the test block.}
+
+\item{\code{result}}{Result.}
 }
 \if{html}{\out{</div>}}
 }
@@ -299,6 +301,8 @@ Tear down the current reporter.
 \if{html}{\out{<a id="method-EvalProgressReporter-end_file"></a>}}
 \if{latex}{\out{\hypertarget{method-EvalProgressReporter-end_file}{}}}
 \subsection{Method \code{end_file()}}{
+Overrides the superclass' method to end the context when the file ends
+since files are reran when running evals.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$end_file()}\if{html}{\out{</div>}}
 }

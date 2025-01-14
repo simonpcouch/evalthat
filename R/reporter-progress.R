@@ -260,6 +260,7 @@ EvalProgressReporter <- R6::R6Class(
     #'
     #' @param context Context from [evaluating()].
     #' @param test The name of the test block.
+    #' @param result Result.
     add_result = function(context, test, result) {
       self$ctxt_n <- self$ctxt_n + 1L
 
@@ -315,6 +316,9 @@ EvalProgressReporter <- R6::R6Class(
       }
     },
 
+    #' @description
+    #' Overrides the superclass' method to end the context when the file ends
+    #' since files are reran when running evals.
     end_file = function() {
       self$end_context()
     }
