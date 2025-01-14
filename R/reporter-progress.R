@@ -206,15 +206,9 @@ EvalProgressReporter <- R6::R6Class(
 
     #' @description
     #' Teardown following the test run.
-    end_context = function(context) {
+    end_context = function() {
       time <- proc.time() - self$ctxt_start_time
       self$last_update <- NULL
-
-      # context with no expectation = automatic file context in file
-      # that also has manual contexts
-      if (self$ctxt_n == 0) {
-        return()
-      }
 
       self$save_results()
 
@@ -322,24 +316,7 @@ EvalProgressReporter <- R6::R6Class(
     },
 
     end_file = function() {
-      self$end_context(self$ctxt_name)
-    },
-
-    #' @description
-    #' Print issues to the screen.
-    # TODO: should this be removed? or made to return nothing?
-    #' @param issues Issues.
-    report_issues = function(issues) {
-      if (issues$size() > 0) {
-        self$rule()
-
-        issues <- issues$as_list()
-        summary <- vapply(issues, issue_summary, FUN.VALUE = character(1))
-        self$cat_tight(paste(summary, collapse = "\n\n"))
-
-        self$cat_line()
-        self$rule()
-      }
+      self$end_context()
     }
   )
 )
@@ -383,15 +360,6 @@ EvalCompactProgressReporter <- R6::R6Class(
     #' Setup.
     start_reporter = function() {
       evalthat_env$last_result <- list()
-    },
-
-    #' @description
-    #' Setup.
-    #'
-    #' @param context Context, formed from `across`.
-    start_context = function(context) {
-      self$ctxt_name <- context
-      self$show_status()
     },
 
     #' @description
