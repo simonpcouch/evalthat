@@ -116,7 +116,7 @@ EvalProgressReporter <- R6::R6Class(
       # todo: this is super fragile
       env_names <- names(env)
       context <- setNames(vapply(env, str, character(1)), env_names)
-      self$ctxt_name <- paste0(unname(context), sep = " ")
+      self$ctxt_name <- paste0(unname(context), sep = " ", recycle0 = TRUE)
       self$.context <- context
       self$ctxt_issues <- testthat:::Stack$new()
 

@@ -29,6 +29,9 @@
 #' via [results_read()] and friends.
 #'
 #' @examplesIf FALSE
+#' # evaluate with the default model twice
+#' evaluate("tests/evalthat/test-ggplot2.R", repeats = 2)
+#'
 #' # evaluate a directory of evals across several models,
 #' # repeating each eval twice
 #' eval <- evaluate(
@@ -80,9 +83,8 @@ evaluate_impl <- function(path,
 
   reporter$start_reporter()
   withr::defer(reporter$end_reporter())
-  purrr::pmap(
-    across,
-    ~test_files_serial(
+  if (nrow(across) == 0) {
+    test_files_serial(
       test_dir = eval_files$eval_dir,
       test_package = NULL,
       load_package = "none",
@@ -90,10 +92,25 @@ evaluate_impl <- function(path,
         file.path(eval_files$eval_dir, eval_files$eval_files),
         times = repeats
       ),
-      env = new_environment(data = list(...), test_env()),
+      env = test_env(),
       reporter = reporter
     )
-  )
+  } else {
+    purrr::pmap(
+      across,
+      ~test_files_serial(
+        test_dir = eval_files$eval_dir,
+        test_package = NULL,
+        load_package = "none",
+        test_paths = rep(
+          file.path(eval_files$eval_dir, eval_files$eval_files),
+          times = repeats
+        ),
+        env = new_environment(data = list(...), test_env()),
+        reporter = reporter
+      )
+    )
+  }
 
   invisible(results_tibble())
 }

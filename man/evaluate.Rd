@@ -49,6 +49,9 @@ via \code{\link[=results_read]{results_read()}} and friends.
 }
 \examples{
 \dontshow{if (FALSE) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+# evaluate with the default model twice
+evaluate("tests/evalthat/test-ggplot2.R", repeats = 2)
+
 # evaluate a directory of evals across several models,
 # repeating each eval twice
 eval <- evaluate(
