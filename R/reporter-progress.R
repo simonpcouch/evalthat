@@ -115,8 +115,9 @@ EvalProgressReporter <- R6::R6Class(
     start_context = function(env) {
       # todo: this is super fragile
       env_names <- names(env)
-      context <- paste0(env_names, " = ", vapply(env, str, character(1)), sep = " ")
-      self$ctxt_name <- context
+      context <- setNames(vapply(env, str, character(1)), env_names)
+      self$ctxt_name <- paste0(unname(context), sep = " ")
+      self$.context <- context
       self$ctxt_issues <- testthat:::Stack$new()
 
       self$ctxt_res_ok <- numeric()
@@ -245,7 +246,7 @@ EvalProgressReporter <- R6::R6Class(
     result_summary = function(timestamp) {
       res <-
         tibble::tibble(
-          evaluating = list(self$ctxt_name),
+          evaluating = list(self$.context),
           pct = self$n_ok * 100 / max(self$n_fail + self$n_ok, 1),
           n_fail = self$n_fail,
           n_pass = self$n_ok,
