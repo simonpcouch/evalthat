@@ -41,7 +41,7 @@ evalthat code looks a lot like testthat code. Here's an example:
 ```r
 chat <- getOption(
   "chat", 
-  default = list(elmer::chat_claude("claude-3-5-sonnet-latest", echo = FALSE))
+  default = list(ellmer::chat_claude("claude-3-5-sonnet-latest", echo = FALSE))
 )[[1]]
 
 evaluating(model = str(chat))
@@ -76,12 +76,12 @@ testthat users will notice a couple changes:
 
 * The `evaluating()` function is sort of like `context()`, and logs metadata about the experiment.
 * The functions `input()` and `output()` flag "what went into the model?" and "what came out?"
-* In addition to the regular `expect_*()` functions from testthat, the package supplies a number of new expectation functions that are helpful in evaluating R code contained in a character string (as it will be when outputted from elmer or its extensions). Those that begin with `expect_*()` are automated, those that begin with `grade_*()` are less-so.
+* In addition to the regular `expect_*()` functions from testthat, the package supplies a number of new expectation functions that are helpful in evaluating R code contained in a character string (as it will be when outputted from ellmer or its extensions). Those that begin with `expect_*()` are automated, those that begin with `grade_*()` are less-so.
 
 Running the above test file results in a persistent _result file_—think of it like a snapshot. evalthat supplies a number of helpers for working with result files, allowing you to compare performance across various models, iterate on prompts, quantify variability in output, and so on. On the full ggplot2 example file, we could run 5 passes evaluating several different models for revising ggplot2 code:
 
 ```{r}
-library(elmer)
+library(ellmer)
 
 temp <- list(temperature = 1)
 

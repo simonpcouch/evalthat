@@ -21,16 +21,6 @@
 #' )
 #'
 #' eval
-#'
-#' # in the eval file, write...
-#' chat <- getOption(
-#'   "chat",
-#'   default = list(elmer::chat_claude("claude-3-5-sonnet-latest", echo = FALSE))
-#' )[[1]]
-#'
-#' evaluating(model = str(chat))
-#'
-#' # ... and so on
 #' @export
 evaluate_across <- function(path = ".", across = tibble(), repeats = 1L, ...) {
   check_data_frame(across)

@@ -32,7 +32,7 @@ evalthat code looks a lot like testthat code. Here’s an example:
 ``` r
 chat <- getOption(
   "chat", 
-  default = list(elmer::chat_claude("claude-3-5-sonnet-latest", echo = FALSE))
+  default = list(ellmer::chat_claude("claude-3-5-sonnet-latest", echo = FALSE))
 )[[1]]
 
 evaluating(model = str(chat))
@@ -72,7 +72,7 @@ testthat users will notice a couple changes:
 - In addition to the regular `expect_*()` functions from testthat, the
   package supplies a number of new expectation functions that are
   helpful in evaluating R code contained in a character string (as it
-  will be when outputted from elmer or its extensions). Those that begin
+  will be when outputted from ellmer or its extensions). Those that begin
   with `expect_*()` are automated, those that begin with `grade_*()` are
   less-so.
 
@@ -84,7 +84,7 @@ On the full ggplot2 example file, we could run 5 passes evaluating
 several different models for revising ggplot2 code:
 
 ``` r
-library(elmer)
+library(ellmer)
 
 temp <- list(temperature = 1)
 

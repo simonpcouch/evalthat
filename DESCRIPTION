@@ -16,7 +16,7 @@ Imports:
     cli,
     devtools,
     dplyr,
-    elmer,
+    ellmer (>= 0.1.0),
     ggplot2,
     purrr,
     qs,

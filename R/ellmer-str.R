@@ -2,7 +2,7 @@
 str.Chat <- function(object, ...) {
   provider <- object$.__enclos_env__$private$provider
 
-  provider_name <- sub("elmer::Provider", "", class(provider)[1])
+  provider_name <- sub("ellmer::Provider", "", class(provider)[1])
   model <- provider@model
 
   extra_args <- provider@extra_args

@@ -1,6 +1,6 @@
 skip_if_offline()
 
-chat <- getOption("chat", default = list(elmer::chat_claude("claude-3-5-sonnet-latest", echo = FALSE)))[[1]]
+chat <- getOption("chat", default = list(ellmer::chat_claude("claude-3-5-sonnet-latest", echo = FALSE)))[[1]]
 
 evaluating(model = str(chat))
 
