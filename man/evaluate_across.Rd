@@ -31,23 +31,12 @@ or any other arbitrary parameter.
 # evaluate a directory of evals across several models,
 # repeating each eval twice
 eval <- evaluate_across(
-  tibble(chat = c(
+  "tests/evalthat/test-ggplot2.R",
+  across = tibble(chat = c(
     chat_openai(model = "gpt-4o-mini", echo = FALSE),
     chat_claude(model = "claude-3-5-sonnet-latest", echo = FALSE))
   ),
   repeats = 2
 )
-
-eval
-
-# in the eval file, write...
-chat <- getOption(
-  "chat",
-  default = list(ellmer::chat_claude("claude-3-5-sonnet-latest", echo = FALSE))
-)[[1]]
-
-evaluating(model = str(chat))
-
-# ... and so on
 \dontshow{\}) # examplesIf}
 }

@@ -111,9 +111,13 @@ EvalProgressReporter <- R6::R6Class(
     #' @description
     #' Resets counters and initiates a progress bar.
     #'
-    #' @param context The current test context.
-    start_context = function(context) {
-      self$ctxt_name <- context
+    #' @param env The current testing env.
+    start_context = function(env) {
+      # todo: this is super fragile
+      env_names <- names(env)
+      context <- setNames(vapply(env, str, character(1)), env_names)
+      self$ctxt_name <- paste0(unname(context), sep = " ")
+      self$.context <- context
       self$ctxt_issues <- testthat:::Stack$new()
 
       self$ctxt_res_ok <- numeric()
@@ -175,8 +179,6 @@ EvalProgressReporter <- R6::R6Class(
         status, " ",
         sprintf("%4d", self$n_ok), " ",
         sprintf("%4d", self$n_fail),
-        # TODO: do some fun `ansi_collapse` on information in `evaluating()`
-        # and keep track of the current pct here
         " | ", file_name_to_context(self$file_name), context
       )
 
@@ -204,8 +206,6 @@ EvalProgressReporter <- R6::R6Class(
 
     #' @description
     #' Teardown following the test run.
-    #'
-    #' @param context Context from [evaluating()].
     end_context = function(context) {
       time <- proc.time() - self$ctxt_start_time
       self$last_update <- NULL
@@ -246,7 +246,7 @@ EvalProgressReporter <- R6::R6Class(
     result_summary = function(timestamp) {
       res <-
         tibble::tibble(
-          evaluating = list(self$ctxt_name),
+          evaluating = list(self$.context),
           pct = self$n_ok * 100 / max(self$n_fail + self$n_ok, 1),
           n_fail = self$n_fail,
           n_pass = self$n_ok,
@@ -266,7 +266,6 @@ EvalProgressReporter <- R6::R6Class(
     #'
     #' @param context Context from [evaluating()].
     #' @param test The name of the test block.
-    #' @param result The `expectation` result, returned by an `expect_` function.
     add_result = function(context, test, result) {
       self$ctxt_n <- self$ctxt_n + 1L
 
@@ -320,6 +319,10 @@ EvalProgressReporter <- R6::R6Class(
       if (time[[3]] > self$min_time) {
         self$cat_line("Duration: ", sprintf("%.1f s", time[[3]]), col = "cyan")
       }
+    },
+
+    end_file = function() {
+      self$end_context(self$ctxt_name)
     },
 
     #' @description
@@ -378,26 +381,17 @@ EvalCompactProgressReporter <- R6::R6Class(
 
     #' @description
     #' Setup.
-    #'
-    #' @param context Context, formed from `evaluating()`.
-    start_reporter = function(context) {
+    start_reporter = function() {
       evalthat_env$last_result <- list()
     },
 
     #' @description
     #' Setup.
     #'
-    #' @param context Context, formed from `evaluating()`.
+    #' @param context Context, formed from `across`.
     start_context = function(context) {
       self$ctxt_name <- context
       self$show_status()
-    },
-
-    #' @description
-    #' Teardown.
-    #'
-    #' @param context Context, formed from `evaluating()`.
-    end_context = function(context) {
     },
 
     #' @description
