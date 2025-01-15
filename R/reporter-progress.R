@@ -111,12 +111,13 @@ EvalProgressReporter <- R6::R6Class(
     #' @description
     #' Resets counters and initiates a progress bar.
     #'
-    #' @param env The current testing env.
-    start_context = function(env) {
+    #' @param context Arguments supplied to the evaluation function, as a
+    #' named list.
+    start_context = function(context) {
       # todo: this is super fragile
-      env_names <- names(env)
-      context <- setNames(vapply(env, str, character(1)), env_names)
-      self$ctxt_name <- paste0(unname(context), sep = " ", recycle0 = TRUE)
+      env_names <- names(context)
+      context <- setNames(vapply(context, str, character(1)), env_names)
+      self$ctxt_name <- paste0(unname(context), collapse = ", ", recycle0 = TRUE)
       self$.context <- context
       self$ctxt_issues <- testthat:::Stack$new()
 

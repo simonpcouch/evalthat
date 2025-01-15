@@ -1,4 +1,4 @@
-(function(chat) {
+function(chat = ellmer::chat_claude(echo = FALSE)) {
   skip_if_offline()
 
   chat$set_system_prompt(
@@ -144,4 +144,4 @@
     expect_match(output, "expression", fixed = TRUE)
     expect_match(output, "CO[2]~", fixed = TRUE)
   })
-})(if (exists("chat")) chat else ellmer::chat_claude("claude-3-5-sonnet-latest", echo = FALSE))
+}

@@ -37,8 +37,8 @@
 #' eval <- evaluate(
 #'   "tests/evalthat/test-ggplot2.R",
 #'   across = tibble(chat = c(
-#'     chat_openai(model = "gpt-4o-mini", echo = FALSE),
-#'     chat_claude(model = "claude-3-5-sonnet-latest", echo = FALSE))
+#'     ellmer::chat_openai(model = "gpt-4o-mini", echo = FALSE),
+#'     ellmer::chat_claude(model = "claude-3-5-sonnet-latest", echo = FALSE))
 #'   ),
 #'   repeats = 2
 #' )
@@ -81,10 +81,14 @@ evaluate_impl <- function(path,
     reporter <- reporter %||% EvalProgressReporter$new()
   }
 
+  # TODO: this should just be a straight-up pmap. Source each of the eval
+  # files to get a list of functions, call each of them with elements of
+  # across.
+
   reporter$start_reporter()
   withr::defer(reporter$end_reporter())
   if (nrow(across) == 0) {
-    test_files_serial(
+    test_eval(
       test_dir = eval_files$eval_dir,
       test_package = NULL,
       load_package = "none",
@@ -92,13 +96,12 @@ evaluate_impl <- function(path,
         file.path(eval_files$eval_dir, eval_files$eval_files),
         times = repeats
       ),
-      env = test_env(),
+      args = list(),
       reporter = reporter
     )
   } else {
-    purrr::pmap(
-      across,
-      ~test_files_serial(
+    for (i in seq_len(nrow(across))) {
+      test_eval(
         test_dir = eval_files$eval_dir,
         test_package = NULL,
         load_package = "none",
@@ -106,13 +109,102 @@ evaluate_impl <- function(path,
           file.path(eval_files$eval_dir, eval_files$eval_files),
           times = repeats
         ),
-        env = new_environment(data = list(...), test_env()),
+        args = purrr::flatten(across[i, , drop = FALSE]),
         reporter = reporter
       )
-    )
+    }
   }
 
   invisible(results_tibble())
+}
+
+# an anologue to `test_files_serial()` but instead of sourcing files who raise
+# conditions in order to log expectation results, it evaluates functions (defined
+# in those files) that raise such conditions.
+test_eval <- function(test_dir,
+                      test_package,
+                      test_paths,
+                      load_package,
+                      reporter,
+                      # only one row worth of `across`
+                      args,
+                      desc = NULL,
+                      stop_on_failure = FALSE,
+                      stop_on_warning = FALSE,
+                      error_call = caller_env()) {
+  env <- testthat::test_env()
+  #reporter$start_context(env)
+  env <- testthat:::test_files_setup_env(
+    test_package,
+    test_dir,
+    load_package,
+    env
+  )
+  testthat:::local_testing_env(env)
+
+  reporters <- testthat:::test_files_reporter(reporter)
+  testthat::with_reporter(
+    reporters$multi,
+    lapply(
+      test_paths,
+      eval_one_file,
+      args = args,
+      env = env,
+      desc = desc,
+      error_call = error_call
+    ),
+    start_end_reporter = FALSE
+  )
+}
+
+# analogous to testthat:::test_one_file
+eval_one_file <- function(path, args, env, desc = NULL, error_call = caller_env()) {
+  reporter <- testthat::get_reporter()
+  on.exit(testthat:::teardown_run(), add = TRUE)
+  reporter$start_file(path)
+  source_eval(path, args = args, reporter = reporter, env = rlang::env(env), desc = desc, error_call = error_call)
+  reporter$end_context_if_started()
+  reporter$end_file()
+}
+
+source_eval <- function (path, args, reporter, env, chdir = TRUE, desc = NULL,
+                         wrap = TRUE, error_call = caller_env()) {
+  stopifnot(file.exists(path))
+  stopifnot(is.environment(env))
+
+  path_sourced <- source(path)
+  eval_fn <- path_sourced$value
+
+  if (!is.function(eval_fn)) {
+    cli::cli_abort(
+      "{.arg path} must return a function when sourced.",
+      call = error_call
+    )
+  }
+
+  # tell the reporter which args it's currently iterating on
+  # todo: need to take a cross with the formals so that there's still
+  # context when default arguments are used
+  reporter$start_context(args)
+
+  withr::local_options(testthat_topenv = env, testthat_path = path)
+  if (wrap) {
+    invisible(
+      testthat:::test_code(
+        test = basename(path),
+        # todo: args doesn't seem to have names
+        code = rlang::call2(eval_fn, !!!args),
+        env = env,
+        default_reporter = StopReporter$new()
+      )
+    )
+  }
+  else {
+    withCallingHandlers(invisible(eval(exprs, env)), error = function(err) {
+      abort(paste0("In path: ", encodeString(path, quote = "\"")),
+            parent = err, call = error_call)
+    })
+  }
 }
 
 active_eval_file <- function(arg = "file", call = parent.frame()) {
@@ -153,39 +245,4 @@ eval_files <- function(path, call = caller_env()) {
 
   eval_files <- list.files(path)
   list(eval_dir = path, eval_files = eval_files[is_eval_file(eval_files)])
-}
-
-# copied from testthat so that we can set `start_end_reporter = FALSE` in `with_reporter()`
-# note: we now _also_ set data based on `across` in env
-test_files_serial <- function(test_dir,
-                              test_package,
-                              test_paths,
-                              load_package,
-                              reporter,
-                              env = NULL,
-                              desc = NULL,
-                              stop_on_failure = FALSE,
-                              stop_on_warning = FALSE,
-                              error_call = caller_env()) {
-  reporter$start_context(env)
-  env <- testthat:::test_files_setup_env(
-    test_package,
-    test_dir,
-    load_package,
-    env
-  )
-  testthat:::local_testing_env(env)
-
-  reporters <- testthat:::test_files_reporter(reporter)
-  testthat::with_reporter(
-    reporters$multi,
-    lapply(
-      test_paths,
-      testthat:::test_one_file,
-      env = env,
-      desc = desc,
-      error_call = error_call
-    ),
-    start_end_reporter = FALSE
-  )
 }
