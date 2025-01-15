@@ -2,7 +2,13 @@
 str.Chat <- function(object, ...) {
   provider <- object$.__enclos_env__$private$provider
 
-  provider_name <- sub("ellmer::Provider", "", class(provider)[1])
+  # ollama uses the OpenAI provider format
+  if (identical(provider@api_key, "ollama")) {
+    provider_name <- "ollama"
+  } else {
+    provider_name <- sub("ellmer::Provider", "", class(provider)[1])
+  }
+
   model <- provider@model
 
   extra_args <- provider@extra_args
