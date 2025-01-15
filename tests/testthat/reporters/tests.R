@@ -1,4 +1,4 @@
-function(something = "important") {
+(function(something) {
   test_that("Success", {
     succeed()
   })
@@ -11,4 +11,4 @@ function(something = "important") {
     f <- function() expect_true(FALSE)
     f()
   })
-}(if (exists("something")) something)
+})(if (exists("something")) something else "important")
