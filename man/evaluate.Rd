@@ -49,6 +49,8 @@ via \code{\link[=results_read]{results_read()}} and friends.
 }
 \examples{
 \dontshow{if (FALSE) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+library(ellmer)
+
 # evaluate with the default model twice
 evaluate("tests/evalthat/test-ggplot2.R", repeats = 2)
 
@@ -57,8 +59,8 @@ evaluate("tests/evalthat/test-ggplot2.R", repeats = 2)
 eval <- evaluate(
   "tests/evalthat/test-ggplot2.R",
   across = tibble(chat = c(
-    ellmer::chat_openai(model = "gpt-4o-mini", echo = FALSE),
-    ellmer::chat_claude(model = "claude-3-5-sonnet-latest", echo = FALSE))
+    chat_openai(model = "gpt-4o-mini", echo = FALSE),
+    chat_claude(model = "claude-3-5-sonnet-latest", echo = FALSE))
   ),
   repeats = 2
 )
