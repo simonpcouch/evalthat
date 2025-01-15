@@ -60,7 +60,7 @@ evaluate_active_file <- function(path = active_eval_file(), across = tibble(),
 }
 
 evaluate_impl <- function(path,
-                          across,
+                          across = tibble(),
                           repeats,
                           ...,
                           reporter = NULL,
@@ -97,7 +97,8 @@ evaluate_impl <- function(path,
         times = repeats
       ),
       args = list(),
-      reporter = reporter
+      reporter = reporter,
+      error_call = call
     )
   } else {
     for (i in seq_len(nrow(across))) {
@@ -110,7 +111,8 @@ evaluate_impl <- function(path,
           times = repeats
         ),
         args = purrr::flatten(across[i, , drop = FALSE]),
-        reporter = reporter
+        reporter = reporter,
+        error_call = call
       )
     }
   }
@@ -183,8 +185,9 @@ source_eval <- function (path, args, reporter, env, chdir = TRUE, desc = NULL,
   }
 
   # tell the reporter which args it's currently iterating on
-  # todo: need to take a cross with the formals so that there's still
-  # context when default arguments are used
+  defaults <- formals(eval_fn)
+  args <- modifyList(as.list(defaults), args)
+
   reporter$start_context(args)
 
   withr::local_options(testthat_topenv = env, testthat_path = path)

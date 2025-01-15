@@ -7,7 +7,7 @@ test_that("`evaluate()` returns results as a tibble (eval reporter)", {
   expect_equal(nrow(results), 2)
   expect_named(
     results,
-    c("important", "pct", "n_fail", "n_pass", "timestamp", "file_hash",
+    c("something", "pct", "n_fail", "n_pass", "timestamp", "file_hash",
       "io", "problems"),
     ignore.order = TRUE
   )
@@ -22,7 +22,7 @@ test_that("`evaluate()` returns results as a tibble (compact reporter)", {
   expect_equal(nrow(results), 1)
   expect_named(
     results,
-    c("important", "pct", "n_fail", "n_pass", "timestamp", "file_hash",
+    c("something", "pct", "n_fail", "n_pass", "timestamp", "file_hash",
       "io", "problems"),
     ignore.order = TRUE
   )
@@ -37,7 +37,7 @@ test_that("`evaluate_active_file()` returns results as a tibble (eval reporter)"
   expect_equal(nrow(results), 2)
   expect_named(
     results,
-    c("important", "pct", "n_fail", "n_pass", "timestamp", "file_hash",
+    c("something", "pct", "n_fail", "n_pass", "timestamp", "file_hash",
       "io", "problems"),
     ignore.order = TRUE
   )
@@ -52,7 +52,7 @@ test_that("`evaluate_active_file()` returns results as a tibble (compact reporte
   expect_equal(nrow(results), 1)
   expect_named(
     results,
-    c("important", "pct", "n_fail", "n_pass", "timestamp", "file_hash",
+    c("something", "pct", "n_fail", "n_pass", "timestamp", "file_hash",
       "io", "problems"),
     ignore.order = TRUE
   )
@@ -117,4 +117,11 @@ test_that("eval_files processes directory path", {
       list(eval_dir = "tests", eval_files = c("test-other.R", "test-something.R"))
     )
   })
+})
+
+test_that("`evaluate()` errors informatively with non-function eval", {
+  expect_snapshot(
+    error = TRUE,
+    results <- evaluate(test_path("reporters", "no-function-returned.R"), repeats = 2)
+  )
 })

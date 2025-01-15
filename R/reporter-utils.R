@@ -165,3 +165,9 @@ ansi_collapse_context <- function(ctxt, width) {
 
   paste0(" [", res, "]")
 }
+
+maybe_str <- function(x) {
+  if (is.atomic(x)) {return(x)}
+
+  str(x)
+}

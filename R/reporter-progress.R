@@ -115,8 +115,7 @@ EvalProgressReporter <- R6::R6Class(
     #' named list.
     start_context = function(context) {
       # todo: this is super fragile
-      env_names <- names(context)
-      context <- setNames(vapply(context, str, character(1)), env_names)
+      context <- setNames(vapply(context, maybe_str, character(1)), names(context))
       self$ctxt_name <- paste0(unname(context), collapse = ", ", recycle0 = TRUE)
       self$.context <- context
       self$ctxt_issues <- testthat:::Stack$new()
@@ -370,14 +369,14 @@ EvalCompactProgressReporter <- R6::R6Class(
     #' @description
     #' Teardown.
     end_reporter = function() {
-      self$save_results()
     },
 
     #' @description
     #' Show current status.
     #'
     #' @param complete Ignored.
-    show_status = function(complete = NULL) {
+    #' @param time Ignored--included for compatibility with [EvalProgressReporter].
+    show_status = function(complete = NULL, time = NULL) {
       self$local_user_output()
       status <- summary_line(
         self$n_fail,
