@@ -83,15 +83,14 @@ several different models for revising ggplot2 code:
 ``` r
 library(ellmer)
 
-temp <- list(temperature = 1)
-
 eval <- evaluate(
   "tests/evalthat/test-ggplot2.R",
   across = tibble(chat = c(
-    chat_openai(model = "gpt-4o", api_args = temp, echo = FALSE),
-    chat_openai(model = "gpt-4o-mini", api_args = temp, echo = FALSE),
-    chat_claude(model = "claude-3-5-sonnet-latest", echo = FALSE))
-  ),
+    chat_openai(model = "gpt-4o", echo = FALSE),
+    chat_openai(model = "gpt-4o-mini", echo = FALSE),
+    chat_claude(model = "claude-3-5-sonnet-latest", echo = FALSE),
+    chat_ollama(model = "qwen2.5-coder:14b", echo = FALSE)
+  )),
   repeats = 5
 )
 ```
@@ -103,24 +102,29 @@ evaluation results for further analysis:
 
 ``` r
 eval
-#> # A tibble: 15 × 8
-#>    model             pct n_fail n_pass timestamp file_hash io           problems
+#> # A tibble: 20 × 8
+#>    chat              pct n_fail n_pass timestamp file_hash io           problems
 #>    <chr>           <dbl>  <dbl>  <dbl> <chr>     <chr>     <list>       <list>  
-#>  1 Claude claude-… 100        0     40 20241206… 6206db86… <named list> <list>  
-#>  2 Claude claude-…  95        2     38 20241206… 6206db86… <named list> <list>  
-#>  3 Claude claude-… 100        0     40 20241206… 6206db86… <named list> <list>  
-#>  4 Claude claude-… 100        0     40 20241206… 6206db86… <named list> <list>  
-#>  5 Claude claude-… 100        0     40 20241206… 6206db86… <named list> <list>  
-#>  6 OpenAI gpt-4o-…  92.5      3     37 20241206… 6206db86… <named list> <list>  
-#>  7 OpenAI gpt-4o-…  97.5      1     39 20241206… 6206db86… <named list> <list>  
-#>  8 OpenAI gpt-4o-… 100        0     40 20241206… 6206db86… <named list> <list>  
-#>  9 OpenAI gpt-4o-…  97.5      1     39 20241206… 6206db86… <named list> <list>  
-#> 10 OpenAI gpt-4o-…  97.5      1     39 20241206… 6206db86… <named list> <list>  
-#> 11 OpenAI gpt-4o …  97.5      1     39 20241206… 6206db86… <named list> <list>  
-#> 12 OpenAI gpt-4o …  95        2     38 20241206… 6206db86… <named list> <list>  
-#> 13 OpenAI gpt-4o …  95        2     38 20241206… 6206db86… <named list> <list>  
-#> 14 OpenAI gpt-4o …  95        2     38 20241206… 6206db86… <named list> <list>  
-#> 15 OpenAI gpt-4o …  97.5      1     39 20241206… 6206db86… <named list> <list>
+#>  1 ollama qwen2.5…  94.4      4     67 20250115… a801f5a8… <named list> <list>  
+#>  2 ollama qwen2.5…  85.9     10     61 20250115… a801f5a8… <named list> <list>  
+#>  3 ollama qwen2.5…  91.5      6     65 20250115… a801f5a8… <named list> <list>  
+#>  4 ollama qwen2.5…  88.7      8     63 20250115… a801f5a8… <named list> <list>  
+#>  5 ollama qwen2.5…  83.1     12     59 20250115… a801f5a8… <named list> <list>  
+#>  6 Claude claude-… 100        0     71 20250115… a801f5a8… <named list> <list>  
+#>  7 Claude claude-…  97.2      2     69 20250115… a801f5a8… <named list> <list>  
+#>  8 Claude claude-… 100        0     71 20250115… a801f5a8… <named list> <list>  
+#>  9 Claude claude-…  98.6      1     70 20250115… a801f5a8… <named list> <list>  
+#> 10 Claude claude-… 100        0     71 20250115… a801f5a8… <named list> <list>  
+#> 11 OpenAI gpt-4o-…  95.8      3     68 20250115… a801f5a8… <named list> <list>  
+#> 12 OpenAI gpt-4o-…  94.4      4     67 20250115… a801f5a8… <named list> <list>  
+#> 13 OpenAI gpt-4o-…  90.1      7     64 20250115… a801f5a8… <named list> <list>  
+#> 14 OpenAI gpt-4o-…  94.4      4     67 20250115… a801f5a8… <named list> <list>  
+#> 15 OpenAI gpt-4o-…  94.4      4     67 20250115… a801f5a8… <named list> <list>  
+#> 16 OpenAI gpt-4o    95.8      3     68 20250115… a801f5a8… <named list> <list>  
+#> 17 OpenAI gpt-4o    93.0      5     66 20250115… a801f5a8… <named list> <list>  
+#> 18 OpenAI gpt-4o    95.8      3     68 20250115… a801f5a8… <named list> <list>  
+#> 19 OpenAI gpt-4o    94.4      4     67 20250115… a801f5a8… <named list> <list>  
+#> 20 OpenAI gpt-4o    97.2      2     69 20250115… a801f5a8… <named list> <list>
 ```
 
 Visualizing this example output:

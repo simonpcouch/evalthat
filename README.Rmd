@@ -78,15 +78,14 @@ Running the above test file results in a persistent _result file_—think of it 
 ```{r}
 library(ellmer)
 
-temp <- list(temperature = 1)
-
 eval <- evaluate(
   "tests/evalthat/test-ggplot2.R",
   across = tibble(chat = c(
-    chat_openai(model = "gpt-4o", api_args = temp, echo = FALSE),
-    chat_openai(model = "gpt-4o-mini", api_args = temp, echo = FALSE),
-    chat_claude(model = "claude-3-5-sonnet-latest", echo = FALSE))
-  ),
+    chat_openai(model = "gpt-4o", echo = FALSE),
+    chat_openai(model = "gpt-4o-mini", echo = FALSE),
+    chat_claude(model = "claude-3-5-sonnet-latest", echo = FALSE),
+    chat_ollama(model = "qwen2.5-coder:14b", echo = FALSE)
+  )),
   repeats = 5
 )
 ```
@@ -115,7 +114,7 @@ library(tidyverse)
 
 plot <- eval %>% 
   ggplot() +
-  aes(x = pct, fill = model) +
+  aes(x = pct, fill = chat) +
   geom_histogram(position = "identity", alpha = .5) +
   xlim(c(0, 100)) +
   labs(
