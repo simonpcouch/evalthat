@@ -144,4 +144,99 @@ function(chat = ellmer::chat_claude(echo = FALSE)) {
     expect_match(output, "expression", fixed = TRUE)
     expect_match(output, "CO[2]~", fixed = TRUE)
   })
+
+  test_that("model can create dual y-axes with sec_axis", {
+    input <- input(
+     "Also show km per liter (multiply mpg by 0.425) on a second y axis:
+      ggplot(mtcars) + aes(x = factor(cyl), y = mpg) + geom_boxplot()"
+    )
+    output <- output(chat$clone()$chat(input))
+
+    # syntactically valid
+    expect_r_code(output)
+
+    # correctness
+    expect_match(output, "scale_y_continuous", fixed = TRUE)
+    expect_match(output, "sec.axis", fixed = TRUE)
+    expect_match(output, "~.*0.425", perl = TRUE)
+  })
+
+  test_that("model can modify axis breaks to avoid overlap", {
+    input <- input(
+      "Rotate the x-axis labels by 45 degrees to avoid overlap:
+     `ggplot(mtcars) + geom_bar(aes(factor(cyl))) + scale_x_discrete()`"
+    )
+    output <- output(chat$clone()$chat(input))
+
+    expect_r_code(output)
+    expect_match(output, "theme(", fixed = TRUE)
+    expect_match(output, "axis.text.x = ", fixed = TRUE)
+    expect_match(output, "angle = 45", fixed = TRUE)
+  })
+
+  test_that("model can add clockwise layout for polar coordinates", {
+    input <- input(
+      "Make this pie chart go clockwise instead of counter-clockwise:
+     `ggplot(mtcars) + geom_bar(aes(x='', fill=factor(cyl))) + coord_polar(theta='y')`"
+    )
+    output <- output(chat$clone()$chat(input))
+
+    expect_r_code(output)
+    expect_match(output, "coord_polar", fixed = TRUE)
+    expect_match(output, "direction", fixed = TRUE)
+  })
+
+  test_that("model can convert barplot from base R", {
+    input <- input("Convert this code to ggplot2: barplot(table(mtcars$cyl))")
+    output <- output(chat$clone()$chat(input))
+
+    expect_r_code(output)
+
+    expect_match(output, "ggplot", fixed = TRUE)
+    expect_match(output, "mtcars", fixed = TRUE)
+    expect_match(output, "factor(cyl)", fixed = TRUE)
+    expect_match(output, "geom_bar(", fixed = TRUE)
+  })
+
+  test_that("model can convert overlaid histograms from base R", {
+    input <- input("Convert this base R histogram to ggplot2:
+                 hist(mtcars$mpg[mtcars$am==0], col=rgb(1,0,0,0.5))
+                 hist(mtcars$mpg[mtcars$am==1], col=rgb(0,0,1,0.5), add=TRUE)")
+    output <- output(chat$clone()$chat(input))
+
+    expect_r_code(output)
+
+    expect_match(output, "ggplot", fixed = TRUE)
+    expect_match(output, "mtcars", fixed = TRUE)
+    expect_match(output, "aes(", fixed = TRUE)
+    expect_match(output, "fill = factor(am)", fixed = TRUE)
+    expect_match(output, "geom_histogram", fixed = TRUE)
+  })
+
+  test_that("model can convert base R plot with facets", {
+    input <- input("Convert this base R code to ggplot2:
+                 par(mfrow=c(1,2))
+                 plot(mpg ~ wt, data=subset(mtcars, am==0))
+                 plot(mpg ~ wt, data=subset(mtcars, am==1))")
+    output <- output(chat$clone()$chat(input))
+
+    expect_r_code(output)
+
+    expect_match(output, "ggplot", fixed = TRUE)
+    expect_match(output, "mtcars", fixed = TRUE)
+    expect_match(output, "aes(", fixed = TRUE)
+    expect_match(output, "x = wt", fixed = TRUE)
+    expect_match(output, "y = mpg", fixed = TRUE)
+    expect_match(output, "facet_wrap|facet_grid", perl = TRUE)
+  })
+
+  test_that("model can diagnose %>% used in place of +", {
+    input <- input("Fix this ggplot2 code:
+                 ggplot(mtcars) %>% geom_point(aes(x = mpg, y = wt))")
+    output <- output(chat$clone()$chat(input))
+
+    expect_r_code(output)
+
+    expect_match(output, " +", fixed = TRUE)
+  })
 }
