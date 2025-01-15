@@ -30,51 +30,49 @@ pak::pak("simonpcouch/evalthat")
 evalthat code looks a lot like testthat code. Here’s an example:
 
 ``` r
-chat <- getOption(
-  "chat", 
-  default = list(ellmer::chat_claude("claude-3-5-sonnet-latest", echo = FALSE))
-)[[1]]
-
-evaluating(model = str(chat))
-
-test_that("model can make a basic histogram", {
-  input <- input(
-    "Write ggplot code to plot a histogram of the mpg variable in mtcars. 
-     Return only the plotting code, no backticks and no exposition."
-  )
-  
-  output <- output(chat$chat(input))
-  
-  # check that output was syntactically code R code
-  expect_r_code(output)
-  
-  # match keywords to affirm intended functionality
-  expect_match(output, "ggplot(", fixed = TRUE)
-  expect_match(output, "aes(", fixed = TRUE)
-  expect_match(output, "geom_histogram(", fixed = TRUE)
-  
-  # flag output for manual grading
-  target <- "ggplot(mtcars) + aes(x = mpg) + geom_histogram()"
-  grade_human(input, output, target)
-  
-  # grade using an LLM---either instantaneously using the current model or
-  # flag for later grading with a different model
-  grade_model(input, output, target)
-})
+(function(chat) {
+  test_that("model can make a basic histogram", {
+    input <- input(
+      "Write ggplot code to plot a histogram of the mpg variable in mtcars. 
+       Return only the plotting code, no backticks and no exposition."
+    )
+    
+    output <- output(chat$chat(input))
+    
+    # check that output was syntactically code R code
+    expect_r_code(output)
+    
+    # match keywords to affirm intended functionality
+    expect_match(output, "ggplot(", fixed = TRUE)
+    expect_match(output, "aes(", fixed = TRUE)
+    expect_match(output, "geom_histogram(", fixed = TRUE)
+    
+    # flag output for manual grading
+    target <- "ggplot(mtcars) + aes(x = mpg) + geom_histogram()"
+    grade_human(input, output, target)
+    
+    # grade using an LLM---either instantaneously using the current model or
+    # flag for later grading with a different model
+    grade_model(input, output, target)
+  })
+})(chat = ellmer::chat_claude())
 ```
 
 testthat users will notice a couple changes:
 
-- The `evaluating()` function is sort of like `context()`, and logs
-  metadata about the experiment.
+- The usual testing file is wrapped in a `function()` and invoked at the
+  end of the file with
+  `if (exists("chat")) chat else ellmer::chat_claude()`, a shorthand
+  that allows for testthat to programatically pass in chats from other
+  providers but default to `ellmer::chat_claude()`.
 - The functions `input()` and `output()` flag “what went into the
   model?” and “what came out?”
 - In addition to the regular `expect_*()` functions from testthat, the
   package supplies a number of new expectation functions that are
   helpful in evaluating R code contained in a character string (as it
-  will be when outputted from ellmer or its extensions). Those that begin
-  with `expect_*()` are automated, those that begin with `grade_*()` are
-  less-so.
+  will be when outputted from ellmer or its extensions). Those that
+  begin with `expect_*()` are automated, those that begin with
+  `grade_*()` are less-so.
 
 Running the above test file results in a persistent *result file*—think
 of it like a snapshot. evalthat supplies a number of helpers for working
