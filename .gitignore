@@ -6,3 +6,4 @@
 .quarto
 
 tests/evalthat/_results
+tests/testthat/reporters/_results
