@@ -175,13 +175,14 @@ Sets the values of \verb{res_*} fields to \code{numeric()} and calls
 \subsection{Method \code{start_context()}}{
 Resets counters and initiates a progress bar.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$start_context(env)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$start_context(context)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{env}}{The current testing env.}
+\item{\code{context}}{Arguments supplied to the evaluation function, as a
+named list.}
 }
 \if{html}{\out{</div>}}
 }
@@ -432,13 +433,15 @@ Teardown.
 \subsection{Method \code{show_status()}}{
 Show current status.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EvalCompactProgressReporter$show_status(complete = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{EvalCompactProgressReporter$show_status(complete = NULL, time = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{complete}}{Ignored.}
+
+\item{\code{time}}{Ignored--included for compatibility with \link{EvalProgressReporter}.}
 }
 \if{html}{\out{</div>}}
 }

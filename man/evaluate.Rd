@@ -57,8 +57,8 @@ evaluate("tests/evalthat/test-ggplot2.R", repeats = 2)
 eval <- evaluate(
   "tests/evalthat/test-ggplot2.R",
   across = tibble(chat = c(
-    chat_openai(model = "gpt-4o-mini", echo = FALSE),
-    chat_claude(model = "claude-3-5-sonnet-latest", echo = FALSE))
+    ellmer::chat_openai(model = "gpt-4o-mini", echo = FALSE),
+    ellmer::chat_claude(model = "claude-3-5-sonnet-latest", echo = FALSE))
   ),
   repeats = 2
 )
