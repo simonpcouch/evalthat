@@ -64,7 +64,7 @@ evalthat code looks a lot like testthat code. Here's an example:
     # flag for later grading with a different model
     grade_model(input, output, target)
   })
-})(chat = ellmer::chat_claude())
+})(if (exists("chat")) chat else chat = ellmer::chat_claude())
 ```
 
 testthat users will notice a couple changes:
