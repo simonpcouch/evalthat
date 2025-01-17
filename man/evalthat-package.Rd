@@ -12,6 +12,7 @@ Provides testthat-style utilities for evaluating large language models in R. Sco
 Useful links:
 \itemize{
   \item \url{https://github.com/simonpcouch/evalthat}
+  \item \url{https://simonpcouch.github.io/evalthat/}
   \item Report bugs at \url{https://github.com/simonpcouch/evalthat/issues}
 }
 
