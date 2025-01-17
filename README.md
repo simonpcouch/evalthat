@@ -16,6 +16,11 @@ you can write unit tests, you can compare performance across various
 LLMs, improve your prompts using evidence, and quantify variability in
 model output.
 
+> Caution!
+>
+> This package is very early in its development and much of its
+> documentation is aspirational.
+
 ## Installation
 
 You can install the development version of evalthat like so:
