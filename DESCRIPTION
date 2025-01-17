@@ -31,6 +31,8 @@ Imports:
     vctrs,
     withr
 Suggests:
-    knitr
+    knitr,
+    rmarkdown
 URL: https://github.com/simonpcouch/evalthat
 BugReports: https://github.com/simonpcouch/evalthat/issues
+VignetteBuilder: knitr

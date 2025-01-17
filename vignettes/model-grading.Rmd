@@ -1,0 +1,56 @@
+---
+title: "Model grading"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Model grading}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+bibliography: references.bib
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Among other things, the evalthat package provides a suite of functionality for **model grading** or, as it's often referred to in the literature, **LLM-as-a-judge**. Model grading entails an LLM evaluating a response from an LLM. That is, after asking a question to an LLM and receiving an answer, both the question and answer are provided to another language model and that model is asked to somehow judge whether the provided response was satisfactory.
+
+Given the infamously stochastic and gullible tendencies of LLMs, it's not all obvious that this should work. Indeed, many earlier attempts at such a framework were unsuccessful by most measures, and only recently have sufficient advancements been made to the point where model grading is a helpful tool in an evaluation toolkit. <!--TODO: more here -->
+
+The design of evalthat's model grading tools is heavily influenced by the most recent research on LLM-as-a-judge. This vignette will outline some of the findings that guided evalthat's interface for model grading.
+
+### 
+
+## Models should not judge their own output
+
+Ergonomically, it's totally reasonable that a practitioner would want to use the same model to generate answers as they use to judge them. If I've gone to the effort to set up an API key and configured access to a model, can't I just use it to judge its own responses? This is unfortunately not the case; LLMs are prone to **self-enhancement bias**, where they're likely to prefer their own answer over one supplied by another model. This holds up even when models don't know where a given response arises from [@ye2024justiceprejudicequantifyingbiases]. As such, evalthat will exclude models from evaluations of responses they generated themselves by default.
+
+## Judge using "strong" LLMs
+
+To reduce the compute associated with evaluating, many studies have proposed making use of smaller models fine-tuned specifically for judging. While these models have shown promise in some applications [@verga2024replacingjudgesjuriesevaluating], research has generally shown that larger models intended for broader use cases tend to make for better evaluators; "although the fine-tuned judge models achieve high performance on in-domain test sets, even surpassing GPT-4, they underperform GPT-4 across several dimensions, including generalizability, fairness, aspect-specific evaluation, and scalability" [@fu-etal-2024-gptscore; @huang2024empiricalstudyllmasajudgellm]. Colloquially, such models are often referred to as "strong" LLMs [@zheng2023judgingllmasajudgemtbenchchatbot; @gu2025surveyllmasajudge].
+
+That said, several of the findings cited here are based on results utilizing—at least in part—smaller, open-source models as judges [@fu-etal-2024-gptscore; @schroeder2024trustllmjudgmentsreliability].
+
+## Prefer pairwise comparisons over scoring
+
+LLMs are often used to evaluate output in two notable ways:
+
+-   Pairwise comparisons: Two models are asked a question (possibly with a human-written reference answer) and both provide answers. Then, a third model is provided the question, the desired answer, and the two model responses, and is asked to choose one of the two model responses as its preference.
+
+-   Scoring: A model is asked a question (possibly with a human-written reference answer) and provides an answer. Then, another model is provided the question, the desired answer, and the model's response, possibly along with a rubric, and is asked to rate the response according to the rubric on some numeric scale.
+
+Scoring methods have been shown to be easily influenced by connotations of wordings and unrelated pieces of context, while models have been shown to evaluate more reliably when comparing pairwise [@ouyang2022training; @schroeder2024trustllmjudgmentsreliability].
+
+### Position matters
+
+In the context of pairwise comparisons, many language models are vulnerable to **position bias**, where models will tend to prefer the response presented first over the one presented second (or vice versa) regardless of the quality of the response [@wang2023largelanguagemodelsfair]. Some models are much more resilient to this than others—for example, *GPT-4-turbo* was shown to prefer the same response when the order was swapped 80.5% of the time, while *LLaMA3-8B-Instruct* did so 38.9% of the time [@gu2025surveyllmasajudge]. Generally, strong LLMs tend to be less susceptible to this bias and a variety of methods exist to address it. <!--# Notably, swapping the order of responses and aggregating across evaluations has been shown to be effective[@zheng2023judgingllmasajudgemtbenchchatbot; @wang2023largelanguagemodelsfair]. -->
+
+## Run the same evaluation multiple times
+
+Notably, related to addressing position bias, summarizing evaluations across multiple runs on the same content has been shown to lead to better evaluations.
+
+To mitigate position bias, @zheng2023judgingllmasajudgemtbenchchatbot call the same judge twice "by swapping the order of two answers and only declare a win when an answer is preferred in both orders." When the preferences are inconsistent after swapping orders, they call it a tie. In the context of scoring, @wang2023largelanguagemodelsfair do so by polling the judge with both orders and then taking the average of the score.
+
+Other studies have proposed that aggregating evaluations across several separate models can mitigate *other* biases. For example, many models demonstrate **verbosity bias**, where they tend to rate longer responses more highly. However, @ye2024justiceprejudicequantifyingbiases showed that "response length influences model judgment in complex ways;" some models are much less susceptible to this bias than others, and some even penalize excessively verbose answers. A similar story goes for **compassion fade**, where models might prefer responses containing references to positively connoted words, or **attentional bias**, where models might disproportionately incorporate irrelevant information into their evaluation [@koo2024benchmarkingcognitivebiaseslarge]. The fact that models vary in their susceptibility to these biases means that aggregating responses across many of them often outperforms use of a single judge [@verga2024replacingjudgesjuriesevaluating; @schroeder2024trustllmjudgmentsreliability]. @gu2025surveyllmasajudge show this to be the case with majority voting specifically.
