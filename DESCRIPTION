@@ -33,6 +33,6 @@ Imports:
 Suggests:
     knitr,
     rmarkdown
-URL: https://github.com/simonpcouch/evalthat
+URL: https://github.com/simonpcouch/evalthat, https://simonpcouch.github.io/evalthat/
 BugReports: https://github.com/simonpcouch/evalthat/issues
 VignetteBuilder: knitr

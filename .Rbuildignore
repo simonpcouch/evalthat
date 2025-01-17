@@ -6,3 +6,7 @@
 tests/evalthat/_results
 
 inst/ex_plot.png
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^\.github$
