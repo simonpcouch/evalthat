@@ -66,6 +66,7 @@ same as those without the \verb{ctxt_*} prefix, but per-context.}
 \item \href{#method-EvalProgressReporter-save_results}{\code{EvalProgressReporter$save_results()}}
 \item \href{#method-EvalProgressReporter-result_summary}{\code{EvalProgressReporter$result_summary()}}
 \item \href{#method-EvalProgressReporter-add_result}{\code{EvalProgressReporter$add_result()}}
+\item \href{#method-EvalProgressReporter-cache_for_grading}{\code{EvalProgressReporter$cache_for_grading()}}
 \item \href{#method-EvalProgressReporter-start_reporter}{\code{EvalProgressReporter$start_reporter()}}
 \item \href{#method-EvalProgressReporter-end_reporter}{\code{EvalProgressReporter$end_reporter()}}
 \item \href{#method-EvalProgressReporter-end_file}{\code{EvalProgressReporter$end_file()}}
@@ -279,6 +280,15 @@ Append a given \verb{expect_*()} or \verb{grade_*()} result to the current conte
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-EvalProgressReporter-cache_for_grading"></a>}}
+\if{latex}{\out{\hypertarget{method-EvalProgressReporter-cache_for_grading}{}}}
+\subsection{Method \code{cache_for_grading()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EvalProgressReporter$cache_for_grading(target)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-EvalProgressReporter-start_reporter"></a>}}
 \if{latex}{\out{\hypertarget{method-EvalProgressReporter-start_reporter}{}}}
 \subsection{Method \code{start_reporter()}}{
@@ -358,6 +368,7 @@ The objects of this class are cloneable with this method.
 <li><span class="pkg-link" data-pkg="testthat" data-topic="ProgressReporter" data-id="should_update"><a href='../../testthat/html/ProgressReporter.html#method-ProgressReporter-should_update'><code>testthat::ProgressReporter$should_update()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="ProgressReporter" data-id="status_data"><a href='../../testthat/html/ProgressReporter.html#method-ProgressReporter-status_data'><code>testthat::ProgressReporter$status_data()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="evalthat" data-topic="EvalProgressReporter" data-id="add_result"><a href='../../evalthat/html/EvalProgressReporter.html#method-EvalProgressReporter-add_result'><code>evalthat::EvalProgressReporter$add_result()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="evalthat" data-topic="EvalProgressReporter" data-id="cache_for_grading"><a href='../../evalthat/html/EvalProgressReporter.html#method-EvalProgressReporter-cache_for_grading'><code>evalthat::EvalProgressReporter$cache_for_grading()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="evalthat" data-topic="EvalProgressReporter" data-id="end_context"><a href='../../evalthat/html/EvalProgressReporter.html#method-EvalProgressReporter-end_context'><code>evalthat::EvalProgressReporter$end_context()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="evalthat" data-topic="EvalProgressReporter" data-id="end_file"><a href='../../evalthat/html/EvalProgressReporter.html#method-EvalProgressReporter-end_file'><code>evalthat::EvalProgressReporter$end_file()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="evalthat" data-topic="EvalProgressReporter" data-id="is_full"><a href='../../evalthat/html/EvalProgressReporter.html#method-EvalProgressReporter-is_full'><code>evalthat::EvalProgressReporter$is_full()</code></a></span></li>
