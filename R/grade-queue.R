@@ -95,7 +95,7 @@ grade_queue_pairwise <- function(x, judges) {
         response_b = response_b
       )))
 
-    graded_pairs <- purrr::list_rbind(graded_pairs, input_graded_pairs)
+    graded_pairs <- dplyr::bind_rows(graded_pairs, input_graded_pairs)
   }
 
   graded_pairs
@@ -150,8 +150,8 @@ grade_pair_safely <- purrr::safely(grade_pair, otherwise = list())
 grade_pair_impl <- function(judge, prompt) {
   response <- judge$clone()$chat(prompt)
 
-  chose_a <- grepl("Best Response: [[A]]", response)
-  chose_b <- grepl("Best Response: [[B]]", response)
+  chose_a <- grepl("Best Response: [[A]]", response, fixed = TRUE)
+  chose_b <- grepl("Best Response: [[B]]", response, fixed = TRUE)
 
   if (isTRUE(chose_a) && isFALSE(chose_b)) {
     return(list(response = response, choice = "a"))
