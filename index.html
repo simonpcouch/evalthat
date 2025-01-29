@@ -91,13 +91,9 @@
 <span>    <span class="fu">expect_match</span><span class="op">(</span><span class="va">output</span>, <span class="st">"aes("</span>, fixed <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span>    <span class="fu">expect_match</span><span class="op">(</span><span class="va">output</span>, <span class="st">"geom_histogram("</span>, fixed <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span>    </span>
-<span>    <span class="co"># flag output for manual grading</span></span>
+<span>    <span class="co"># flag output for grading either by yourself or an LLM judge</span></span>
 <span>    <span class="va">target</span> <span class="op">&lt;-</span> <span class="st">"ggplot(mtcars) + aes(x = mpg) + geom_histogram()"</span></span>
-<span>    <span class="fu">grade_human</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">target</span><span class="op">)</span></span>
-<span>    </span>
-<span>    <span class="co"># grade using an LLM---either instantaneously using the current model or</span></span>
-<span>    <span class="co"># flag for later grading with a different model</span></span>
-<span>    <span class="fu">grade_model</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">target</span><span class="op">)</span></span>
+<span>    <span class="fu">grade_output</span><span class="op">(</span><span class="va">target</span><span class="op">)</span></span>
 <span>  <span class="op">}</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>testthat users will notice a couple changes:</p>
