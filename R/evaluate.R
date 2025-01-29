@@ -200,7 +200,7 @@ source_eval <- function (path, args, reporter, env, chdir = TRUE, desc = NULL,
         # todo: args doesn't seem to have names
         code = rlang::call2(eval_fn, !!!args),
         env = env,
-        default_reporter = StopReporter$new()
+        reporter = StopReporter$new()
       )
     )
   }
