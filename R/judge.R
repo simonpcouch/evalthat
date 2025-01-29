@@ -32,10 +32,10 @@ judges <- function(...) {
   structure(res, class = "judges")
 }
 
-check_judge <- function(x, x_name, call = caller_env()) {
+check_judge <- function(x, x_name = caller_arg(x), call = caller_env()) {
   if (!inherits(x, "Chat")) {
     cli::cli_abort(
-      "{.arg {x_name}} must be an ellmer Chat, not a {.obj_type_friendly {x}}",
+      "{.arg {x_name}} must be an ellmer Chat, not {.obj_type_friendly {x}}",
       call = call
     )
   }

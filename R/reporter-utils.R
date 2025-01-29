@@ -171,3 +171,12 @@ maybe_str <- function(x) {
 
   str(x)
 }
+
+o_apply <- function(objects, method, ...) {
+  x <- NULL # silence check note
+  f <- new_function(exprs(x = ), expr(
+    if (method %in% names(x)) `$`(x, !!method)(...)
+  ))
+
+  lapply(objects, f)
+}

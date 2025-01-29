@@ -60,13 +60,9 @@ function(chat = ellmer::chat_claude()) {
     expect_match(output, "aes(", fixed = TRUE)
     expect_match(output, "geom_histogram(", fixed = TRUE)
     
-    # flag output for manual grading
+    # flag output for grading either by yourself or an LLM judge
     target <- "ggplot(mtcars) + aes(x = mpg) + geom_histogram()"
-    grade_human(input, output, target)
-    
-    # grade using an LLM---either instantaneously using the current model or
-    # flag for later grading with a different model
-    grade_model(input, output, target)
+    grade_output(target)
   })
 }
 ```

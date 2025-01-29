@@ -35,6 +35,8 @@ EvalProgressReporter <- R6::R6Class(
     ctxt_issues = NULL,
     ctxt_n = 0,
 
+    queue = list(),
+
     res_ok = numeric(),
     res_skip = numeric(),
     res_warn = numeric(),
@@ -241,7 +243,6 @@ EvalProgressReporter <- R6::R6Class(
       res <-
         tibble::tibble(
           evaluating = list(self$.context),
-          pct = self$n_ok * 100 / max(self$n_fail + self$n_ok, 1),
           n_fail = self$n_fail,
           n_pass = self$n_ok,
           timestamp = timestamp,
@@ -249,6 +250,18 @@ EvalProgressReporter <- R6::R6Class(
           io = list(self$io),
           problems = list(self$problems$as_list())
         )
+
+      if (!identical(self$queue, list())) {
+        # has results that need grading
+        res <- dplyr::mutate(res, queue = list(self$queue), .before = n_fail)
+      } else {
+        res <-
+          res %>%
+          dplyr::mutate(
+            pct = n_pass * 100 / max(n_fail + n_pass, 1),
+            .before = n_fail
+          )
+      }
 
       evalthat_env$last_result <- c(evalthat_env$last_result, list(res))
 
@@ -293,6 +306,19 @@ EvalProgressReporter <- R6::R6Class(
 
       self$update_counts()
       self$show_status()
+    },
+
+    cache_for_grading = function(target) {
+      evalthatenv <- env_get(ns_env("evalthat"), "evalthat_env")
+
+      self$queue <- c(
+        self$queue,
+        list(list(
+          input = evalthatenv$input,
+          output = evalthatenv$output,
+          target = target
+        ))
+      )
     },
 
     #' @description
