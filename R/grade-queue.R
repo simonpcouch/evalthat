@@ -128,26 +128,11 @@ generate_pairs <- function(unique_ids) {
   pairs <- transform(pairs, row1 = pmin(row1, row2), row2 = pmax(row1, row2))
   pairs <- unique(pairs)
 
-  # randomly swap the orderings to address position bias.
-  # TODO: this should actually be done by judging in both orderings
-  # and then marking tie if not consistent
-  pairs <-
-    pairs %>%
-    mutate(
-      swap = runif(nrow(.)),
-      swap = swap > .5,
-      row_1 = if_else(swap, row2, row1),
-      row_2 = if_else(swap, row1, row2)
-    ) %>%
-    select(row1 = row_1, row2 = row_2)
-
   return(pairs)
 }
 
 grade_pair <- function(judges, input, target, response_a, response_b) {
-  # TODO: make this a pair of prompts where the two are exchanged
-  # to combat position bias
-  prompt <-
+  prompt_original <-
     grade_pair_prompt(
       input = input,
       target = target,
@@ -155,7 +140,53 @@ grade_pair <- function(judges, input, target, response_a, response_b) {
       response_b = response_b
     )
 
-  lapply(judges, grade_pair_impl, prompt)
+  prompt_switched <-
+    grade_pair_prompt(
+      input = input,
+      target = target,
+      response_a = response_b,
+      response_b = response_a
+    )
+
+  res_original <- lapply(judges, grade_pair_impl, prompt_original)
+  res_switched <- lapply(judges, grade_pair_impl, prompt_switched)
+
+  merge_graded_pairings(res_original, res_switched)
+}
+
+# merge a pair of grade_pair_impl() outputs by, for each judge, voting to determine
+# the position-consistent winner.
+merge_graded_pairings <- function(original, switched) {
+  res <- list()
+  judges <- names(original)
+
+  for (judge in judges) {
+    response_original <- original[[judge]]
+    response_switched <- switched[[judge]]
+
+    orig <- response_original$choice
+    switch <- response_switched$choice
+
+    # in these results, the model choosing a in one ordering and b in the
+    # other means that the model was position-consistent. if the model chooses
+    # the same position in both orderings, it chose two different responses.
+    combined_choice <- case_when(
+        orig == "a" & switch == "b" ~ "a",
+        orig == "b" & switch == "a" ~ "b",
+        (orig == "a" & switch == "a") | (orig == "b" & switch == "b") ~ "tie",
+        TRUE ~ NA_character_
+    )
+
+    judge_res <- list(
+      choice = combined_choice,
+      response_original = response_original,
+      response_switched = response_original
+    )
+
+    res[[judge]] <- judge_res
+  }
+
+  res
 }
 
 grade_pair_safely <- purrr::safely(grade_pair, otherwise = list())
