@@ -131,8 +131,6 @@ generate_pairs <- function(unique_ids) {
   return(pairs)
 }
 
-grade_pair_safely <- purrr::safely(grade_pair, otherwise = list())
-
 grade_pair <- function(judges, input, target, response_a, response_b) {
   # TODO: make this a pair of prompts where the two are exchanged
   # to combat position bias
@@ -146,6 +144,8 @@ grade_pair <- function(judges, input, target, response_a, response_b) {
 
   lapply(judges, grade_pair_impl, prompt)
 }
+
+grade_pair_safely <- purrr::safely(grade_pair, otherwise = list())
 
 grade_pair_impl <- function(judge, prompt) {
   response <- judge$clone()$chat(prompt)
