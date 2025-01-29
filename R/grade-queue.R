@@ -128,6 +128,19 @@ generate_pairs <- function(unique_ids) {
   pairs <- transform(pairs, row1 = pmin(row1, row2), row2 = pmax(row1, row2))
   pairs <- unique(pairs)
 
+  # randomly swap the orderings to address position bias.
+  # TODO: this should actually be done by judging in both orderings
+  # and then marking tie if not consistent
+  pairs <-
+    pairs %>%
+    mutate(
+      swap = runif(nrow(.)),
+      swap = swap > .5,
+      row_1 = if_else(swap, row2, row1),
+      row_2 = if_else(swap, row1, row2)
+    ) %>%
+    select(row1 = row_1, row2 = row_2)
+
   return(pairs)
 }
 
