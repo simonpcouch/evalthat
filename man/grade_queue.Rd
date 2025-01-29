@@ -30,10 +30,6 @@ ggplot2 <- evaluate(
 
 ggplot2
 
-ggplot2_graded <- grade_queue(
-  ggplot2,
-  judges = judges(gpt4o = chat_openai(model = "gpt-4o"))
-)
 
 ggplot2_graded
 }

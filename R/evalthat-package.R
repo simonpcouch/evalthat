@@ -6,7 +6,6 @@
 #
 # address "Namespaces in Imports field not imported from" NOTE:
 #' @importFrom R6 R6Class
-#' @importFrom treesitter.r language
 #' @importFrom tibble tibble
 #' @importFrom ellmer chat_claude
 #

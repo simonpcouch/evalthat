@@ -26,8 +26,6 @@ Imports:
     testthat,
     tidyr,
     tibble,
-    treesitter,
-    treesitter.r,
     vctrs,
     withr
 Suggests:

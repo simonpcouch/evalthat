@@ -17,7 +17,7 @@ Check if input is syntactically valid R code
 }
 \details{
 This helper does not attempt to evaluate the code in the provided string.
-Instead, it uses \code{\link[treesitter:parser-parse]{treesitter::parser_parse()}} to determine whether the string
+Instead, it uses \code{\link[=parse]{parse()}} to determine whether the string
 contains valid R syntax.
 
 This expectation will fail if \code{object} contains any exposition surrounding
