@@ -3,7 +3,8 @@ responses provided by two AI assistants to the user question displayed below.
 You should choose the assistant that follows the user’s instructions and
 {target}
 Your evaluation should consider factors such as the helpfulness, relevance, 
-accuracy, conciseness, and level of detail of their responses. 
+accuracy, conciseness, and level of detail of their responses, though be terse
+and don't provide your reasoning, just your judgement.
 
 * Ensure that the order in which the responses were presented does not influence
 your decision. 
