@@ -87,8 +87,7 @@ grade_queue_pairwise <- function(x, judges) {
       }) %>%
       purrr::list_rbind() %>%
       dplyr::rowwise() %>%
-      # TODO: include the models' "reasoning" when it has some
-      dplyr::mutate(result = list(grade_pair(
+      dplyr::mutate(result = list(grade_pair_safely(
         judge = judge,
         input = input,
         target = target,
@@ -131,6 +130,8 @@ generate_pairs <- function(unique_ids) {
 
   return(pairs)
 }
+
+grade_pair_safely <- purrr::safely(grade_pair, otherwise = list())
 
 grade_pair <- function(judges, input, target, response_a, response_b) {
   # TODO: make this a pair of prompts where the two are exchanged
