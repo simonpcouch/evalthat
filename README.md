@@ -11,15 +11,15 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 status](https://www.r-pkg.org/badges/version/evalthat)](https://CRAN.R-project.org/package=evalthat)
 <!-- badges: end -->
 
+> IMPORTANT:
+>
+> This package is archived and has been superseded by
+> [rinspect](https://github.com/simonpcouch/rinspect).
+
 evalthat provides a testthat-style framework for LLM evaluation in R. If
 you can write unit tests, you can compare performance across various
 LLMs, improve your prompts using evidence, and quantify variability in
 model output.
-
-> Caution!
->
-> This package is very early in its development and much of its
-> documentation is aspirational.
 
 ## Installation
 
